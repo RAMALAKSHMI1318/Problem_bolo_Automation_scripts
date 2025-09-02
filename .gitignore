@@ -1,0 +1,6 @@
+# Created by pytest automatically.
+artifacts/
+venv/
+__pychace__/
+.pytest_cache/
+ 

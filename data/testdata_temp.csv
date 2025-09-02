@@ -1,0 +1,84 @@
+TC ID,Module/Screen,Title,Preconditions,Test Steps,Test Data,Expected Result,Type,Priority,Status,Remarks
+AUTH01,Authentication,Valid Login with Email and Password,User has valid registered account,"1. Navigate to login page
+2. Enter valid email address
+3. Enter valid password
+4. Click Login button","Email:admin@email.com
+Password:password",User successfully logs in and redirects to dashboard based on role,UI,High,Passed,Login performed successfully
+AUTH02,Authentication,Invalid Login with Wrong Password,User account exists in system,"1. Navigate to login page
+2. Enter valid email address
+3. Enter incorrect password
+4. Click Login button","Email: admin@email.com
+Password: wrongPassword",Login fails with error message 'Invalid credentials',Negative,High,Passed,"AUTH02 Exception: Locator expected to be visible
+Actual value: <element(s) not found> 
+Call log:
+  - Expect ""to_be_visible"" with timeout 10000ms
+  - waiting for get_by_role(""button"", name=""Log-in"")
+"
+AUTH03,Authentication,Invalid Login with Non-existent Email,System has registration functionality,"1. Navigate to login page
+2. Enter non-existent email address
+3. Enter any password
+4. Click Login button","Email: nonexistent@email.com
+Password: anyPassword123",Login fails with appropriate error message,Negative,Medium,Passed,"AUTH03 Exception: Locator expected to be visible
+Actual value: <element(s) not found> 
+Call log:
+  - Expect ""to_be_visible"" with timeout 10000ms
+  - waiting for get_by_role(""button"", name=""Log-in"")
+"
+AUTH04,Authentication,Empty Email Field Validation,User on login page,"1. Navigate to login page
+2. Leave email field empty
+3. Enter valid password
+4. Click Login button",Password: password,Validation error shown for required email field,UI,Medium,Passed,"AUTH04 Exception: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role(""button"", name=""Next"")
+    - locator resolved to <button disabled tabindex=""-1"" type=""button"" class=""MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-13kdibl-MuiButtonBase-root-MuiButton-root"">Next</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    57 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+"
+AUTH05,Authentication,Empty Password Field Validation,User on login page,"1. Navigate to login page
+2. Enter valid email
+3. Leave password field empty
+4. Click Login button",Email: admin@email.com,Validation error shown for required password field,UI,Medium,Passed,"AUTH05 Exception: Locator.click: Timeout 30000ms exceeded.
+Call log:
+  - waiting for get_by_role(""button"", name=""Next"")
+    - locator resolved to <button disabled tabindex=""-1"" type=""button"" class=""MuiButtonBase-root MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary Mui-disabled MuiButton-root MuiButton-contained MuiButton-containedPrimary MuiButton-sizeMedium MuiButton-containedSizeMedium MuiButton-colorPrimary css-13kdibl-MuiButtonBase-root-MuiButton-root"">Next</button>
+  - attempting click action
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and stable
+      - element is not enabled
+    - retrying click action
+      - waiting 100ms
+    57 × waiting for element to be visible, enabled and stable
+       - element is not enabled
+     - retrying click action
+       - waiting 500ms
+"
+AUTH06,Authentication,Invalid Email Format Validation,User on login page,"1. Navigate to login page
+2. Enter invalid email format
+3. Enter valid password
+4. Click Login button","Email: ad.com@gmail.com
+Password: password",Validation error shown for invalid email format,UI,Medium,Passed,"AUTH06 Exception: Locator expected to be visible
+Actual value: <element(s) not found> 
+Call log:
+  - Expect ""to_be_visible"" with timeout 10000ms
+  - waiting for get_by_role(""button"", name=""Log-in"")
+"
+AUTH09,Authentication,Password Visibility Toggle,User on login page,"1. Navigate to login page
+2. Enter password in password field
+3. Click eye icon to show password
+4. Click eye icon again to hide password",Password: testPassword123,Password visibility toggles correctly between hidden and visible,UI,Low,Passed,Password visibility toggles correctly between hidden and visible
+AUTH07,Login Screen,UI Load Test,User not authenticated,Navigate to /login,,Login form displays with email/password fields and tabs,UI,High,Passed,Login form displays with email/password fields and tabs
+AUTH08,Login Screen,Forgot Password Modal,User on Details tab,Click 'Forgot Password' link,,Forgot password modal opens,UI,Medium,Passed,Forgot password modal opens
