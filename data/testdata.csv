@@ -3,7 +3,7 @@ AUTH01,Authentication,Valid Login with Email and Password,User has valid registe
 2. Enter valid email address
 3. Enter valid password
 4. Click Login button","Email:admin@email.com
-Password:P@ssword1234",User successfully logs in and redirects to dashboard based on role,UI,High,Passed,User successfully logs in and redirects to dashboard based on role
+Password:password",User successfully logs in and redirects to dashboard based on role,UI,High,Passed,User successfully logs in and redirects to dashboard based on role
 AUTH02,Authentication,Invalid Login with Wrong Password,User account exists in system,"1. Navigate to login page
 2. Enter valid email address
 3. Enter incorrect password
@@ -77,3 +77,63 @@ Call log:
   - Expect ""to_be_visible"" with timeout 10000ms
   - waiting for get_by_role(""button"", name=""Log-in"")
 "
+AUTH09,Authentication,Password Visibility Toggle,User on login page,"1. Navigate to login page
+2. Enter password in password field
+3. Click eye icon to show password
+4. Click eye icon again to hide password",Password: testPassword123,Password visibility toggles correctly between hidden and visible,UI,Low,Passed,Password visibility toggles correctly between hidden and visible
+AUTH07,Login Screen,UI Load Test,User not authenticated,Navigate to /login,,Login form displays with email/password fields and tabs,UI,High,Passed,Login form displays with email/password fields and tabs
+AUTH11,Login Screen,Email Masking,User on OTP tab,Display email option,adm*********@email.com,Email displayed as adm*********@problembolo.com,UI,Low,Passed,Email displayed as adm*********@problembolo.com
+AUTH10,Login Screen,Tab Navigation,User completed step 1,System auto-navigates to OTP tab,"Email:admin@email.com
+Password:password",OTP tab active with radio button for email option,UI,Medium,Passed,OTP tab active with radio button for email option
+AUTH15,Login Screen,OTP Input UI,User on Confirmation tab,Load OTP input screen,"admin@email.com
+Password:password",4 OTP input boxes displayed with focus on first box,UI,Medium,Not Executed,
+AUTH16,Login Screen,OTP Input Validation,User on Confirmation tab,Enter invalid characters,"admin@email.com
+Password:password",Only A-Z and 0-9 allowed; invalid chars rejected,UI,Medium,Not Executed,
+FPASS01,Forgot Password Modal,Open Modal,User on login screen,Click 'Forgot Password' link,,Forgot Password modal opens with 3-step tabs (Details/OTP/Set New Password),UI,High,Passed,Forgot Password modal opens with 3-step tabs (Details/OTP/Set New Password)
+FPASS02,Forgot Password Modal,Modal TitleModal opened,,Check modal header,Forgot Password,Title displays 'Forgot Password',UI,Low,Passed,Title displays 'Forgot Password'
+FPASS03,Forgot Password Details,Tab UI,Step 1 - Details tab,Check form elements,Or,Mobile number and Email input fields with 'Or' separator displayed,UI,Medium,Passed,Mobile number and Email input fields with 'Or' separator displayed
+FPASS04,Forgot Password Details,Mobile Number Input,Details tab active,Enter mobile number,mobile:6476437332,Mobile number entered and stored,UI,Medium,Passed,Mobile number entered and stored
+FPASS05,Forgot Password Details,Email Input,Details tab active,Enter email address,Email:admin@email.com,Email entered and stored + check flag set to true,UI,Medium,Passed,Email entered and stored + check flag set to true
+FPASS06,Forgot Password Details,Both Inputs Filled,Details tab active,Enter both mobile and email,"mobile:7686438677
+Email:admin@email.com",Both inputs accepted + email takes precedence (check=true),UI,Medium,Passed,Both inputs accepted + email takes precedence (check=true)
+FPASS07,Forgot Password Details,Next Button State,No input provided,Check Next button,"mobile=""''; email=""''",Next button disabled,UI,Medium,Passed,Next button disabled
+FPASS08,Forgot Password OTP,Tab Navigation,Successfully sent OTP,System navigates to OTP tab,"mobile:7686438677
+Email:admin@email.com",OTP tab active + 4 input boxes displayed + countdown timer starts,UI,Medium,Passed,OTP tab active + 4 input boxes displayed + countdown timer starts
+FPASS09,Forgot Password OTP,Email Display,OTP tab active,Check email display,"email:admin@email.com
+masked_email:adm********@email.com",Email displayed as 'use********@domain.com',UI,Low,Passed,Email displayed as 'use********@domain.com'
+FPASS10,Forgot Password OTP,OTP Input Validation,OTP tab active,Enter invalid characters,"email:admin@email.com
+OTP:abc_",Only A-Z and 0-9 allowed; invalid chars rejected,UI,Medium,Failed,Expected: Only A-Z and 0-9 allowed; invalid chars rejected | Actual: 
+FPASS11,Forgot Password OTP,OTP Auto-focus,OTP tab active,Enter valid character,"email:admin@email.com
+OTP:abcd",Focus automatically moves to next input box,UI,Low,Passed,Focus automatically moves to next input box
+FPASS12,Forgot Password OTP,OTP Backspace Navigation,OTP tab active,Press backspace on empty field,"email:admin@email.com
+OTP:abcd",Focus moves to previous input box,UI,Low,Passed,Focus moves to previous input box
+FPASS13,Forgot Password OTP,Next Button State,Incomplete OTP,Check Next button state,"email:admin@email.com
+OTP:abcd",Next button disabled until all 4 digits entered,UI,Medium,Failed,Expected: Next button disabled until all 4 digits entered | Actual: Next button enabled
+FPASS14,Forgot Password OTP,Countdown Timer,OTP tab loaded,Check timer functionality,email:admin@email.com,20-second countdown displays + Resend button disabled,UI,Medium,Failed,Expected: 20-second countdown displays + Resend button disabled | Actual: Resend enabled too early
+FPASS15,Forgot Password OTP,Resend OTP Timer,Timer at 0,Wait for countdown to complete,email:admin@email.com,Resend OTP button becomes enabled,UI,Medium,Passed,Resend OTP button becomes enabled
+FPASS16,Forgot Password OTP,Back Button,OTP tab active,Click Back button,email:admin@email.com,Navigate back to Details tab + OTP cleared,UI,Medium,Passed,Navigate back to Details tab + OTP cleared
+FPASS17,Set New Password,Tab UI,Successfully verified OTP,Navigate to Set New Password tab,email:admin@email.com,New Password and Confirm Password fields displayed with eye toggles,UI,Medium,Failed,Expected: New Password and Confirm Password fields displayed with eye toggles | Actual: Set New Password tab not visible
+FPASS18,Set New Password,Password Input,Password tab active,Enter new password,"Email:admin@email.com
+Password:P@ssword1234",Password entered and masked by default,UI,Medium,Failed,Expected: Password entered and masked by default | Actual: Toggle failed
+FPASS19,Set New Password,Confirm Password Input,Password entered,Enter confirm password,"Email:admin@email.com
+Password:P@ssword1234
+confirmpassword:P@ssword1234",Confirm password entered,UI,Medium,Passed,Confirm password entered
+FPASS20,Set New Password,Password Mismatch,Different passwords entered,Enter different passwords,"Email:admin@email.com
+Password:P@ssword1234
+confirmpassword:Password1234",Form validation shows passwords don't match + button disabled,UI,Medium,Passed,Form validation shows passwords don't match + button disabled
+FPASS21,Set New Password,Password Toggle,Passwords entered,Click eye icon,"Email:admin@email.com
+Password:P@ssword1234
+confirmpassword:Password1234",Password visibility toggles between text/password for both fields,UI,Low,Not Executed,
+FPASS22,Set New Password,Register Button State,Empty passwords,Check button state,"Email:admin@email.com
+Password:""""
+confirmpassword:""""",Register button disabled,UI,Medium,Not Executed,
+FPASS23,Set New Password,Back Button,Password tab active,Click Back button,Email:admin@email.com,Navigate back to OTP tab + password fields cleared,UI,Medium,Not Executed,
+FPASS24,Forgot Password Modal,Modal Close Button,Modal opened,Click X close button,N/A,Modal closes + all form data cleared + returns to login,UI,Medium,Not Executed,
+FPASS25,Password Success Modal,Success Display,Password reset successful,API returns success,"Email:admin@email.com
+Password:password
+confirmpassword:password",PasswordSuccess modal opens with success message,UI,Medium,Not Executed,
+FPASS26,Password Success Modal,Success Modal Close,Success modal open,Close success modal,"Email:admin@email.com
+Password:password
+confirmpassword:password",Success modal closes + return to login screen,UI,Medium,Not Executed,
+FPASS27,Forgot Password Modal,Escape Key,Modal open,Press Escape key,N/A,Modal remains open (escape key disabled for security),UI,Low,Not Executed,
+FPASS28,Forgot Password Modal,Modal Backdrop Click,Modal open,Click outside modal area,N/A,Modal remains open (backdrop click disabled for security),UI,Low,Not Executed,

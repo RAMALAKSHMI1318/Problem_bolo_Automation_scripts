@@ -1,161 +1,130 @@
+import time
 import pytest
 import pandas as pd
 import re
 import os
 from pages.password_toggle_page import PasswordTogglePage
+from pages.login_page import LoginPage
 from pytest_html import extras
 from config import CSV_FILE
+from playwright.sync_api import Page, expect
+
+
 
 # ------------------ LOAD CSV ------------------
 test_data_df = pd.read_csv(CSV_FILE, engine="python")
 
-# Filter rows by TC ID
-auth07_df = test_data_df[test_data_df['TC ID'] == 'AUTH07']
-auth07_data = auth07_df.to_dict(orient="records")
 
-auth08_df = test_data_df[test_data_df['TC ID'] == 'AUTH08']
-auth08_data = auth08_df.to_dict(orient="records")
+def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
+    """Helper to update CSV + attach screenshot if failed."""
+    last_index = test_data_df[test_data_df['TC ID'] == tcid].index[0]
+    if passed:
+        test_data_df.at[last_index, "Status"] = "Passed"
+        test_data_df.at[last_index, "Remarks"] = expected
+    else:
+        test_data_df.at[last_index, "Status"] = "Failed"
+        test_data_df.at[last_index, "Remarks"] = f"Expected: {expected} | Actual: {error}"
 
-auth09_df = test_data_df[test_data_df['TC ID'] == 'AUTH09']
-auth09_data = auth09_df.to_dict(orient="records")
+        # Screenshot for failed step
+        if not os.path.exists("reports"):
+            os.makedirs("reports")
+        screenshot_path = os.path.join("reports", f"{tcid}_failure.png")
+        page_obj.take_screenshot(screenshot_path)
+
+        if hasattr(request.config, "_html"):
+            request.config._html.extra.append(extras.image(screenshot_path))
+            request.config._html.extra.append(extras.text(f"{tcid} Failed: {error}"))
+
+    try:
+        test_data_df.to_csv(CSV_FILE, index=False)
+    except PermissionError:
+        temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
+        test_data_df.to_csv(temp_csv, index=False)
 
 
-# ------------------ TEST CASE AUTH07 ------------------
-@pytest.mark.parametrize("tc_index,tc", [(0, auth07_data[0])])
-def test_auth07_click_login_tab(page, tc_index, tc, request):
-    """AUTH07: Click Login/Signin tab."""
+# ------------------ AUTH07 ------------------
+def test_auth07_login_tab(page, request):
+    row = test_data_df[test_data_df['TC ID'] == 'AUTH07'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
     password_page = PasswordTogglePage(page)
-    test_passed = False
-    error_msg = ""
-    expected_result = tc.get("Expected Result", "N/A")
 
     try:
         password_page.navigate()
         password_page.click_login_tab()
-        test_passed = True
-
+        update_csv_and_report(password_page, request, "AUTH07", expected, True)
     except Exception as e:
-        error_msg = str(e)
-        if not os.path.exists("reports"):
-            os.makedirs("reports")
-        screenshot_path = os.path.join("reports", f"{tc['TC ID']}_failure.png")
-        password_page.take_screenshot(screenshot_path)
-        if hasattr(request.config, "_html"):
-            request.config._html.extra.append(extras.image(screenshot_path))
-            request.config._html.extra.append(extras.text(f"{tc['TC ID']} Failed: {error_msg}"))
+        update_csv_and_report(password_page, request, "AUTH07", expected, False, str(e))
+        pytest.fail("AUTH07 failed")
 
-    finally:
-        last_index = auth07_df.index[0]
-        if test_passed:
-            test_data_df.at[last_index, "Status"] = "Passed"
-            test_data_df.at[last_index, "Remarks"] = expected_result
-        else:
-            test_data_df.at[last_index, "Status"] = "Failed"
-            test_data_df.at[last_index, "Remarks"] = f"Expected: {expected_result} | Actual: {error_msg}"
+# ------------------ AUTH09 ------------------
+def test_auth09_password_toggle(page, request):
+    row = test_data_df[test_data_df['TC ID'] == 'AUTH09'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = str(row.get("Test Data", ""))
+    password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
+    password = password_match.group(1) if password_match else ""
 
-        try:
-            test_data_df.to_csv(CSV_FILE, index=False)
-        except PermissionError:
-            temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
-            test_data_df.to_csv(temp_csv, index=False)
-
-    if not test_passed:
-        pytest.fail(f"{tc['TC ID']} Failed - {error_msg}")
-
-
-# ------------------ TEST CASE AUTH08 ------------------
-@pytest.mark.parametrize("tc_index,tc", [(0, auth08_data[0])])
-def test_auth08_forgot_password(page, tc_index, tc, request):
-    """AUTH08: Click Forgot Password after Login/Signin tab."""
     password_page = PasswordTogglePage(page)
-    test_passed = False
-    error_msg = ""
-    expected_result = tc.get("Expected Result", "N/A")
 
     try:
         password_page.navigate()
-        password_page.click_login_tab()
-        page = password_page.page  # access underlying Playwright page
-        page.get_by_role("button", name="Forgot Password?").click()
-        test_passed = True
-
-    except Exception as e:
-        error_msg = str(e)
-        if not os.path.exists("reports"):
-            os.makedirs("reports")
-        screenshot_path = os.path.join("reports", f"{tc['TC ID']}_failure.png")
-        password_page.take_screenshot(screenshot_path)
-        if hasattr(request.config, "_html"):
-            request.config._html.extra.append(extras.image(screenshot_path))
-            request.config._html.extra.append(extras.text(f"{tc['TC ID']} Failed: {error_msg}"))
-
-    finally:
-        last_index = auth08_df.index[0]
-        if test_passed:
-            test_data_df.at[last_index, "Status"] = "Passed"
-            test_data_df.at[last_index, "Remarks"] = expected_result
+        if password_page.perform_password_toggle_test(password):
+            update_csv_and_report(password_page, request, "AUTH09", expected, True)
         else:
-            test_data_df.at[last_index, "Status"] = "Failed"
-            test_data_df.at[last_index, "Remarks"] = f"Expected: {expected_result} | Actual: {error_msg}"
-
-        try:
-            test_data_df.to_csv(CSV_FILE, index=False)
-        except PermissionError:
-            temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
-            test_data_df.to_csv(temp_csv, index=False)
-
-    if not test_passed:
-        pytest.fail(f"{tc['TC ID']} Failed - {error_msg}")
+            update_csv_and_report(password_page, request, "AUTH09", expected, False, "Toggle did not work")
+            pytest.fail("AUTH09 failed")
+    except Exception as e:
+        update_csv_and_report(password_page, request, "AUTH09", expected, False, str(e))
+        pytest.fail("AUTH09 failed")
 
 
-# ------------------ TEST CASE AUTH09 ------------------
-@pytest.mark.parametrize("tc_index,tc", [(0, auth09_data[0])])
-def test_auth09_password_toggle(page, tc_index, tc, request):
-    """AUTH09: Verify password toggle functionality after Login/Signin tab clicked."""
-    password_page = PasswordTogglePage(page)
-    test_passed = False
-    error_msg = ""
-    expected_result = tc.get("Expected Result", "N/A")
+# ------------------ AUTH10 ------------------
+def test_auth10_first_next(page, request):
+    row = test_data_df[test_data_df['TC ID'] == 'AUTH10'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = str(row.get("Test Data", ""))
+    email, password = "", ""
+    if "Email:" in test_data_str:
+        email = test_data_str.split("Email:")[1].split(",")[0].strip()
+    if "Password:" in test_data_str:
+        password = test_data_str.split("Password:")[1].strip()
+
+    login_page = LoginPage(page)
 
     try:
-        password_page.navigate()
-        password_page.click_login_tab()  # Ensure login tab is active
-
-        # Extract password from Test Data
-        test_data_str = str(tc.get("Test Data", ""))
-        password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
-        password = password_match.group(1) if password_match else ""
-
-        result = password_page.perform_password_toggle_test(password)
-        if not result:
-            raise Exception("Password toggle failed")
-
-        test_passed = True
-
+        login_page.navigate()
+        login_page.tab_login.click()
+        login_page.input_email.fill(email)
+        login_page.input_password.fill(password)
+        login_page.btn_next.click()
+        update_csv_and_report(login_page, request, "AUTH10", expected, True)
     except Exception as e:
-        error_msg = str(e)
-        if not os.path.exists("reports"):
-            os.makedirs("reports")
-        screenshot_path = os.path.join("reports", f"{tc['TC ID']}_failure.png")
-        password_page.take_screenshot(screenshot_path)
-        if hasattr(request.config, "_html"):
-            request.config._html.extra.append(extras.image(screenshot_path))
-            request.config._html.extra.append(extras.text(f"{tc['TC ID']} Failed: {error_msg}"))
+        update_csv_and_report(login_page, request, "AUTH10", expected, False, str(e))
+        pytest.fail("AUTH10 failed")
 
-    finally:
-        last_index = auth09_df.index[0]
-        if test_passed:
-            test_data_df.at[last_index, "Status"] = "Passed"
-            test_data_df.at[last_index, "Remarks"] = expected_result
-        else:
-            test_data_df.at[last_index, "Status"] = "Failed"
-            test_data_df.at[last_index, "Remarks"] = f"Expected: {expected_result} | Actual: {error_msg}"
 
-        try:
-            test_data_df.to_csv(CSV_FILE, index=False)
-        except PermissionError:
-            temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
-            test_data_df.to_csv(temp_csv, index=False)
+# ------------------ AUTH11 ------------------
+def test_auth11_verify_email_in_otp_tab(page, request):
+    row = test_data_df[test_data_df['TC ID'] == 'AUTH11'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = str(row.get("Test Data", ""))
 
-    if not test_passed:
-        pytest.fail(f"{tc['TC ID']} Failed - {error_msg}")
+    # Extract email from Test Data
+    email = ""
+    if "Email:" in test_data_str:
+        email = test_data_str.split("Email:")[1].strip()
+
+    login_page = LoginPage(page)
+
+    try:
+        # OTP tab is assumed open after AUTH10
+        email_locator = page.get_by_text(email, exact=True)
+        assert email_locator.is_visible(), f"Email {email} not visible on OTP tab"
+        update_csv_and_report(login_page, request, "AUTH11", expected, True)
+    except Exception as e:
+        update_csv_and_report(login_page, request, "AUTH11", expected, False, str(e))
+        pytest.fail("AUTH11 failed")
+        
+
+
+

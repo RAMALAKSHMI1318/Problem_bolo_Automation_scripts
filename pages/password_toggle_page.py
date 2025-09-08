@@ -7,7 +7,6 @@ class PasswordTogglePage(BasePage):
         self.tab_login = page.get_by_role("tab", name="Login/Signin")
         self.input_password = page.get_by_role("textbox", name="Enter Password")
         self.btn_toggle_password = page.get_by_role("button", name="toggle password visibility")
-        self.btn_forgot_password = page.get_by_role("button", name="Forgot Password?")
 
     def click_login_tab(self):
         self.tab_login.click()
