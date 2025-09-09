@@ -10,7 +10,17 @@ class LoginPage(BasePage):
         self.input_password = page.get_by_role("textbox", name="Enter Password")
         self.btn_next = page.get_by_role("button", name="Next")
         self.btn_login = page.get_by_role("button", name="Log-in")
+        self.otp_inputs = page.locator("input[type='text'][maxlength='1']")
+        self.countdown_text = page.locator("p.MuiTypography-body1.field-link")
+        self.resend_button = page.locator("button:has-text('Resend')")
+        self.masked_email = page.locator("span.MuiFormControlLabel-label", has_text="Email:")
+        self.btn_get_started = page.get_by_role("button", name="Get Started")
+        self.btn_admin_menu = page.get_by_role("button", name="Admin")  # top-right user menu
+        self.tab_settings = page.locator("button[role='tab']", has_text="Settings")
+        self.tab_account_settings = page.get_by_role("tab", name="Account Settings")
 
+        # --- Logout button inside Account Settings ---
+        self.btn_logout = page.get_by_role("button", name="Click here to Logout")
 
 
     def login(self, email: str, password: str):

@@ -85,10 +85,20 @@ AUTH07,Login Screen,UI Load Test,User not authenticated,Navigate to /login,,Logi
 AUTH11,Login Screen,Email Masking,User on OTP tab,Display email option,adm*********@email.com,Email displayed as adm*********@problembolo.com,UI,Low,Passed,Email displayed as adm*********@problembolo.com
 AUTH10,Login Screen,Tab Navigation,User completed step 1,System auto-navigates to OTP tab,"Email:admin@email.com
 Password:password",OTP tab active with radio button for email option,UI,Medium,Passed,OTP tab active with radio button for email option
-AUTH15,Login Screen,OTP Input UI,User on Confirmation tab,Load OTP input screen,"admin@email.com
+AUTH15,Login Screen,OTP Input UI,User on Confirmation tab,Load OTP input screen,"Email:admin@email.com
 Password:password",4 OTP input boxes displayed with focus on first box,UI,Medium,Not Executed,
-AUTH16,Login Screen,OTP Input Validation,User on Confirmation tab,Enter invalid characters,"admin@email.com
-Password:password",Only A-Z and 0-9 allowed; invalid chars rejected,UI,Medium,Not Executed,
+AUTH16,Login Screen,OTP Input Validation,User on Confirmation tab,Enter invalid characters,"Email:admin@email.com
+Password:password,OTP:ade-",Only A-Z and 0-9 allowed; invalid chars rejected,UI,Medium,Not Executed,
+AUTH12,Login Screen,OTP Auto-focus,User on Confirmation tab,Enter valid character,"Email:admin@email.com
+Password:password,OTP:adeb",Focus moves to next input box automatically,UI,Low,Not Executed,
+AUTH13,Login Screen,OTP Backspace,User on Confirmation tab,Press backspace on empty field,"Email:admin@email.com
+Password:password,OTP:abcd",Focus moves to previous input box,UI,Low,Not Executed,
+AUTH14,Login Screen,Resend OTP Timer,User on Confirmation tab,Wait for countdown,"Email:admin@email.com
+Password:password",Countdown from 20 seconds; Resend button disabled until 0,UI,Medium,Not Executed,
+AUTH17,Login Screen,Keyboard Navigation,User on any tab,Press Enter key,"Email:admin@email.com
+Password:password",Triggers appropriate action for current tab (Next/Send OTP/Login),UI,Low,Not Executed,
+AUTH18,Logout Functionality,Manual Logout,User clicks logout,Call logout function,"Email:admin@email.com
+Password:password",localStorage cleared + redirect to login + isAuthenticated=false,Functional,High,Not Executed,
 FPASS01,Forgot Password Modal,Open Modal,User on login screen,Click 'Forgot Password' link,,Forgot Password modal opens with 3-step tabs (Details/OTP/Set New Password),UI,High,Passed,Forgot Password modal opens with 3-step tabs (Details/OTP/Set New Password)
 FPASS02,Forgot Password Modal,Modal TitleModal opened,,Check modal header,Forgot Password,Title displays 'Forgot Password',UI,Low,Passed,Title displays 'Forgot Password'
 FPASS03,Forgot Password Details,Tab UI,Step 1 - Details tab,Check form elements,Or,Mobile number and Email input fields with 'Or' separator displayed,UI,Medium,Passed,Mobile number and Email input fields with 'Or' separator displayed
