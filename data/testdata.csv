@@ -138,12 +138,15 @@ FPASS22,Set New Password,Register Button State,Empty passwords,Check button stat
 Password:""""
 confirmpassword:""""",Register button disabled,UI,Medium,Not Executed,
 FPASS23,Set New Password,Back Button,Password tab active,Click Back button,Email:admin@email.com,Navigate back to OTP tab + password fields cleared,UI,Medium,Not Executed,
-FPASS24,Forgot Password Modal,Modal Close Button,Modal opened,Click X close button,N/A,Modal closes + all form data cleared + returns to login,UI,Medium,Not Executed,
+FPASS24,Forgot Password Modal,Modal Close Button,Modal opened,Click X close button,,Modal closes + all form data cleared + returns to login,UI,Medium,Not Executed,
 FPASS25,Password Success Modal,Success Display,Password reset successful,API returns success,"Email:admin@email.com
 Password:password
 confirmpassword:password",PasswordSuccess modal opens with success message,UI,Medium,Not Executed,
 FPASS26,Password Success Modal,Success Modal Close,Success modal open,Close success modal,"Email:admin@email.com
 Password:password
 confirmpassword:password",Success modal closes + return to login screen,UI,Medium,Not Executed,
-FPASS27,Forgot Password Modal,Escape Key,Modal open,Press Escape key,N/A,Modal remains open (escape key disabled for security),UI,Low,Not Executed,
-FPASS28,Forgot Password Modal,Modal Backdrop Click,Modal open,Click outside modal area,N/A,Modal remains open (backdrop click disabled for security),UI,Low,Not Executed,
+FPASS27,Forgot Password Modal,Escape Key,Modal open,Press Escape key,,Modal remains open (escape key disabled for security),UI,Low,Not Executed,
+FPASS28,Forgot Password Modal,Modal Backdrop Click,Modal open,Click outside modal area,,Modal remains open (backdrop click disabled for security),UI,Low,Not Executed,
+,,,,,,,,,,
+PERSONNEL,,,,,,,,,,
+PERS02,Add Personnel,Personnel Details,Add personnel modal,Fill personal information,"Email:admin@email.com,password:password,firstname:Johns,lastname:Doe,email:john123456@email.com, phone:8765987654,emailid:johns123456,address:hyderabad",Personal details saved,Functional,High,Passed,Personal details saved
