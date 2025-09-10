@@ -15,6 +15,8 @@ class PersonnelPage(BasePage):
         # --- Step 1: Organization type ---
         self.dropdown_org_type = page.get_by_label("", exact=True)
         self.option_governance = page.get_by_role("option", name="Governance")
+        self.option_administrator = page.get_by_role("option", name="Administrator")
+
 
         # --- Step 2: Location selectors ---
         self.cmb_country = page.get_by_role("combobox").nth(0)
@@ -83,3 +85,29 @@ class PersonnelPage(BasePage):
         self.select_org_type()
         self.select_location()
         self.fill_personnel_details(firstname, lastname, phone, email, empid, address)
+
+    def select_org_types(self, org_type: str):
+        self.dropdown_org_type.click()
+        self.page.get_by_role("option", name=org_type).click()
+
+    def navigate_and_select_location(self, org_type="Governance"):
+        self.btn_get_started.click()
+        self.btn_personnel.click()
+        self.btn_add_personnel.click()
+        self.dropdown_org_type.click()
+        if org_type.lower() == "governance":
+            self.option_governance.click()
+        else:
+            self.option_administrator.click()
+
+        # Step 3: Select Location
+        self.btn_next.click()
+        self.cmb_country.click()
+        self.option_india.click()
+        self.cmb_state.click()
+        self.option_telangana.click()
+        self.cmb_city.click()
+        self.option_hyderabad.click()
+        self.cmb_area.click()
+        self.option_hydcity.click()
+

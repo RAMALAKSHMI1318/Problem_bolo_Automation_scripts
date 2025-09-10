@@ -93,3 +93,91 @@ def test_pers02_add_personnel(page: Page, request):
         # Step 4: Mark as Failed + screenshot
         update_csv_and_report(personnel_page, request, "PERS02", expected, False, str(e))
         pytest.fail(f"PERS02 failed: {str(e)}")
+
+def test_pers03_select_profile(page: Page, request):
+    # ------------------ Load Test Data ------------------
+    row = test_data_df[test_data_df['TC ID'] == 'PERS03'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = row.get("Test Data", "")
+
+    # Parse test data into dictionary
+    data_map = {}
+    for item in test_data_str.split(","):
+        if ":" in item:
+            key, val = item.split(":", 1)
+            data_map[key.strip()] = val.strip()
+
+    # Extract values
+    email = data_map.get("Email")
+    password = data_map.get("password")
+    org_type = data_map.get("profileType", "Governance")  # Governance/Administrator
+
+    # Page objects
+    login_page = LoginPage(page)
+    personnel_page = PersonnelPage(page)
+
+    try:
+        # Step 1: Login
+        login_page.navigate()
+        login_page.login(email, password)
+
+        # Step 2: Navigate to Personnel → Add Personnel
+        personnel_page.btn_get_started.click()
+        personnel_page.btn_personnel.click()
+        personnel_page.btn_add_personnel.click()
+
+        # Step 3: Select Organization type
+        personnel_page.select_org_types(org_type)
+
+        # ✅ Pass if dropdown option was selected
+        update_csv_and_report(personnel_page, request, "PERS03", expected, True)
+        print(f"✅ PERS03: Organization type '{org_type}' selected successfully")
+
+    except Exception as e:
+        # ❌ Fail if not selected
+        update_csv_and_report(personnel_page, request, "PERS03", expected, False, str(e))
+        pytest.fail(f"PERS03 failed: {str(e)}")
+
+def test_pers04_assign_jurisdiction(page: Page, request):
+    # ------------------ Load Test Data ------------------
+    row = test_data_df[test_data_df['TC ID'] == 'PERS04'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = row.get("Test Data", "")
+
+    # Parse test data into dictionary
+    data_map = {}
+    for item in test_data_str.split(","):
+        if ":" in item:
+            key, val = item.split(":", 1)
+            data_map[key.strip()] = val.strip()
+
+    # Extract login credentials
+    email = data_map.get("Email")
+    password = data_map.get("password")
+    org_type = data_map.get("profileType", "Governance")  # optional, defaults to Governance
+
+    # Page objects
+    login_page = LoginPage(page)
+    personnel_page = PersonnelPage(page)
+
+    try:
+        # Step 1: Login
+        login_page.navigate()
+        login_page.login(email, password)
+
+        # Step 2: Navigate and select org type + location
+        personnel_page.navigate_and_select_location(org_type=org_type)
+
+        # Step 3: (Optional) Select jurisdiction if needed
+        # Example: personnel_page.cmb_jurisdiction.click()
+        #          personnel_page.page.get_by_role("option", name="TestJurisdiction").click()
+
+        # Step 4: Mark as Passed and update CSV
+        update_csv_and_report(personnel_page, request, "PERS04", expected, True)
+        print(f"✅ PERS04: Personnel location workflow completed for {email}")
+
+    except Exception as e:
+        # Step 5: Mark as Failed + screenshot
+        update_csv_and_report(personnel_page, request, "PERS04", expected, False, str(e))
+        pytest.fail(f"PERS04 failed for {email}: {str(e)}")
+

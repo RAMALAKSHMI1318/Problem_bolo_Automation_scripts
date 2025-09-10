@@ -150,3 +150,5 @@ FPASS28,Forgot Password Modal,Modal Backdrop Click,Modal open,Click outside moda
 ,,,,,,,,,,
 PERSONNEL,,,,,,,,,,
 PERS02,Add Personnel,Personnel Details,Add personnel modal,Fill personal information,"Email:admin@email.com,password:password,firstname:Johns,lastname:Doe,email:john123456@email.com, phone:8765987654,emailid:johns123456,address:hyderabad",Personal details saved,Functional,High,Passed,Personal details saved
+PERS03,Add Personnel,Profile Selection,Details completed,Select personnel profile type,"Email:admin@email.com,password:password,profileType:Governance",Profile type selected,Functional,High,Not Executed,
+PERS04,Add Personnel,Jurisdiction Selection,Profile selected,Choose jurisdiction,"Email:admin@email.com,password:password,profileType:Governance",Jurisdiction assigned,Functional,High,Not Executed,
