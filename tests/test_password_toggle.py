@@ -499,13 +499,7 @@ def test_auth18_logout_functionality(page, request):
     try:
         # Step 1: Login
         login_page.navigate()
-        login_page.tab_login.click()
-        login_page.input_email.fill(email)
-        login_page.input_password.fill(password)
-        login_page.btn_next.click()
-        page.wait_for_timeout(1000)
-        login_page.btn_next.click()
-        login_page.btn_login.click()
+        login_page.login(email, password)
 
         # Step 2: Navigate dashboard and click logout
         login_page.btn_get_started.click()

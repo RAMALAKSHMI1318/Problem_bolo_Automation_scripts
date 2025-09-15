@@ -9,14 +9,14 @@ class ForgotPasswordPage(BasePage):
     FORGOT_PASSWORD_BUTTON = "button[name='Forgot Password?']"
     FORGOT_PASSWORD_HEADING = "text=Forgot Password"
     CROSS_BUTTON = "button:has(svg[data-testid='CloseIcon'])"
-    # FPASS03 / FPASS04 / FPASS05 locators
+    
     MOBILE_INPUT = "input[placeholder='1 (702) 123-4567']"
     EMAIL_INPUT = "input[placeholder='Enter Registered Email Address']"
     OR_SEPARATOR = "text=Or"
-    NEXT_BUTTON = "button:has-text('Next'):not([disabled])"  # only enabled Next button
+    NEXT_BUTTON = "button:has-text('Next'):not([disabled])"  
 
-     # ----------------- New locator for FPASS07 -----------------
-    NEXT_BUTTON_DISABLED = "button:has-text('Next')"  # use this in FPASS07 to check disabled state
+     
+    NEXT_BUTTON_DISABLED = "button:has-text('Next')"  
     RESEND_BUTTON = "button:has-text('Resend')"
     RESEND_OTP_BUTTON = "button:has-text('Resend OTP')"
     BACK_BUTTON = "button:has-text('Back')"
@@ -45,7 +45,7 @@ class ForgotPasswordPage(BasePage):
         return locator.is_visible()
 
     def click_cross_button(self):
-        self.page.get_by_role("button").first.click()  # replace if needed
+        self.page.get_by_role("button").first.click()  
 
     # ----------------- FPASS03 Actions -----------------
     def is_mobile_input_visible(self) -> bool:
@@ -66,10 +66,10 @@ class ForgotPasswordPage(BasePage):
     def enter_mobile_number(self, mobile: str):
         locator = self.page.locator(self.MOBILE_INPUT)
         expect(locator).to_be_visible(timeout=5000)
-        locator.fill(mobile)  # prepend country code if required
+        locator.fill(mobile)  
 
     
-    # Wait a short time for validation to enable the Next button
+    
         self.page.wait_for_timeout(1000)
 
 
