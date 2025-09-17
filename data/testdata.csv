@@ -12,7 +12,7 @@ Password: wrongPassword",Login fails with error message 'Invalid credentials',Ne
 Actual value: <element(s) not found> 
 Call log:
   - Expect ""to_be_visible"" with timeout 10000ms
-  - waiting for get_by_role(""button"", name=""Log-in"")
+  - waiting for locator(""p.MuiTypography-body1"").filter(has_text=""OTP:"")
 "
 AUTH03,Authentication,Invalid Login with Non-existent Email,System has registration functionality,"1. Navigate to login page
 2. Enter non-existent email address
@@ -22,7 +22,7 @@ Password: anyPassword123",Login fails with appropriate error message,Negative,Me
 Actual value: <element(s) not found> 
 Call log:
   - Expect ""to_be_visible"" with timeout 10000ms
-  - waiting for get_by_role(""button"", name=""Log-in"")
+  - waiting for locator(""p.MuiTypography-body1"").filter(has_text=""OTP:"")
 "
 AUTH04,Authentication,Empty Email Field Validation,User on login page,"1. Navigate to login page
 2. Leave email field empty
@@ -61,11 +61,10 @@ Call log:
       - element is not enabled
     - retrying click action
       - waiting 100ms
-    51 × waiting for element to be visible, enabled and stable
+    57 × waiting for element to be visible, enabled and stable
        - element is not enabled
      - retrying click action
        - waiting 500ms
-    - waiting for element to be visible, enabled and stable
 "
 AUTH06,Authentication,Invalid Email Format Validation,User on login page,"1. Navigate to login page
 2. Enter invalid email format
@@ -155,3 +154,17 @@ PERS04,Add Personnel,Jurisdiction Selection,Profile selected,Choose jurisdiction
 PERS05,Add Personnel,Institution Assignment,Jurisdiction selected,Assign to institution,"Email:admin@email.com,password:password,institution:Telangana Traffic Police",Institution assignment completed,Functional,High,Not Executed,
 PERS06,Edit Personnel,Update Details,Personnel exists,Modify personnel information,"Email:admin@email.com,password:password,search_name:john,name:Doeee",Personnel details updated,Functional,High,Not Executed,
 PERS07,View Personnel,Personnel Profile,Personnel exists,Open personnel view,"Email:admin@email.com,password:password,search_name:john,name:Doeee",Complete personnel profile displayed,UI,Medium,Not Executed,
+,,,,,,,,,,
+# GOVERNANCE MANAGEMENT MODULE,,,,,,,,,,
+GOV01,Add Governance,Governance Body Details,Add governance modal,Fill governance body info,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,MinistryFile:uploads/governanceV5/ministryV5.csv",Governance body details saved,Functional,High,Not Executed,
+GOV02,Add Governance,Role Details,Body details completed,Define governance roles,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,MinistryFile:uploads/governanceV5/ministryV5.csv,RolesFile:uploads/governanceV5/rolesV5.csv",Governance roles created,Functional,High,Not Executed,
+GOV03,Add Governance,Personnel Details,Roles defined,Add personnel to governance,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,MinistryFile:uploads/governanceV5/ministryV5.csv,RolesFile:uploads/governanceV5/rolesV5.csv,OfficersFile:uploads/governanceV5/officersV5.csv",Personnel added to governance body,Functional,High,Not Executed,
+GOV04,Add Governance,Role-Personnel Mapping,Personnel added,Map roles to personnel,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,MinistryFile:uploads/governanceV5/ministryV5.csv,RolesFile:uploads/governanceV5/rolesV5.csv,OfficersFile:uploads/governanceV5/officersV5.csv,RolesAssignments:Chief Minister|Rajendra Bhosale;Deputy Chief Minister|Swati Sameer Wadke;Municipal Minister|Anil Muley;Home Minister|Milind Sabnis",Role assignments completed,Functional,High,Not Executed,
+GOV05,Edit Governance,Update Body Details,Governance exists,Modify governance information,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,UpdatedMinistryFile: uploads/governanceV5/updatedministryV5.csv",Governance body updated,Functional,High,Not Executed,
+GOV06,Edit Governance,Role Management,Governance exists,Add/edit governance roles,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity,UpdatedMinistryFile:uploads/governanceV5/updatedministryV5.csv,RolesFile:uploads/governanceV5/updatedrolesV5.csv",Governance roles updated,Functional,Medium,Not Executed,
+GOV07,View Governance,Governance Overview,Governance exists,Open governance view,"email:admin@email.com,password:password,country:india,state:AndhraPradesh,district:Guntur,city:GunturCity",Complete governance structure displayed,UI,Medium,Not Executed,
+,,,,,,,,,,
+# PARTY MANAGEMENT MODULE,,,,,,,,,,
+PARTY01,Add Party,Party Details,Add party modal,Fill party information,"email:admin@email.com,password:password,partylogo:uploads/partylogos/tdp.jpg,party_name:telugu desham party,country:India,state:AndhraPradesh,district:Kurnool,city:KurnoolCity",Party created successfully,Functional,High,Passed,Party created successfully
+PARTY02,Edit Party,Update Party,Party exists,Modify party details,"email:admin@email.com,password:password,partylogo:uploads/partylogos/tdp.jpg,party_name:telugu desham party(TDP),country:India,state:AndhraPradesh,district:Kurnool,city:KurnoolCityname=Updated Party",Party details updated,Functional,High,Passed,Party details updated
+PARTY03,View Party,Party Profile,Party exists,Open party view modal,"email:admin@email.com,password:password,partylogo:uploads/partylogos/tdp.jpg,country:India,state:AndhraPradesh,district:Kurnool,city:KurnoolCity",Complete party information displayed,UI,Medium,Passed,Complete party information displayed

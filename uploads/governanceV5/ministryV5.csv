@@ -1,0 +1,5 @@
+Name,ParentName,Institution
+ChiefMinister,,"Telangana Traffic Police,Greater Hyderabad Municipal Corporation"
+Deputy Chief Minister,ChiefMinister,"Telangana Traffic Police,Greater Hyderabad Municipal Corporation"
+Municipal Minister,ChiefMinister,Greater Hyderabad Municipal Corporation
+Home Minister,ChiefMinister,Telangana Traffic Police

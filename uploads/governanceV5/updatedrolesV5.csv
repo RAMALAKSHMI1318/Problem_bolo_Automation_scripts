@@ -1,0 +1,6 @@
+Name,ParentName
+Chief Minister,
+Deputy Chief Minister,Chief Minister
+Municipal Minister,Chief Minister
+Home Minister,Chief Minister
+Deputy Minister,Chief Minister

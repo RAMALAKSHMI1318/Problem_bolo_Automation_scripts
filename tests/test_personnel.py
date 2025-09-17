@@ -181,3 +181,121 @@ def test_pers04_assign_jurisdiction(page: Page, request):
         update_csv_and_report(personnel_page, request, "PERS04", expected, False, str(e))
         pytest.fail(f"PERS04 failed for {email}: {str(e)}")
 
+def test_pers05_institution_assignment(page: Page, request):
+    # ------------------ Load Test Data ------------------
+    row = test_data_df[test_data_df['TC ID'] == 'PERS05'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = row.get("Test Data", "")
+
+    # Parse test data into dictionary
+    data_map = {}
+    for item in test_data_str.split(","):
+        if ":" in item:
+            key, val = item.split(":", 1)
+            data_map[key.strip()] = val.strip()
+
+    # Extract values from CSV
+    email = data_map.get("Email")
+    password = data_map.get("password")
+    institution = data_map.get("institution")   # ✅ Now from CSV
+
+    # Page objects
+    login_page = LoginPage(page)
+    personnel_page = PersonnelPage(page)
+
+    try:
+        # Step 1: Login
+        login_page.navigate()
+        login_page.login(email, password)
+
+        # Step 2: Assign Institution (Administrator)
+        personnel_page.assign_institution_admin(institution_name=institution)
+
+        # Step 3: Mark as Passed
+        update_csv_and_report(personnel_page, request, "PERS05", expected, True)
+        print(f"✅ PERS05: Institution '{institution}' assigned successfully for {email}")
+
+    except Exception as e:
+        # Step 4: Mark as Failed
+        update_csv_and_report(personnel_page, request, "PERS05", expected, False, str(e))
+        pytest.fail(f"PERS05 failed for {email}: {str(e)}")
+
+
+def test_pers06_edit_personnel(page: Page, request):
+    # ------------------ Load Test Data ------------------
+    row = test_data_df[test_data_df['TC ID'] == 'PERS06'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = row.get("Test Data", "")
+
+    # Parse test data safely
+    data_map = {}
+    for item in test_data_str.split(","):
+        if ":" in item or "=" in item:
+            key, val = item.replace("=", ":").split(":", 1)  # normalize separator
+            data_map[key.strip()] = val.strip()
+
+    # Extract values directly from CSV
+    email = data_map.get("Email")
+    password = data_map.get("password")
+    search_name = data_map.get("search_name")
+    updated_last_name = data_map.get("name", "Updated Name")
+
+    # Page objects
+    login_page = LoginPage(page)
+    personnel_page = PersonnelPage(page)
+
+    try:
+        # Step 1: Login
+        login_page.navigate()
+        login_page.login(email, password)
+
+        # Step 2: Edit Personnel
+        personnel_page.edit_personnel(search_name, updated_last_name)
+
+        # Step 3: Mark as Passed
+        update_csv_and_report(personnel_page, request, "PERS06", expected, True)
+        print(f"✅ PERS06: Personnel '{search_name}' updated to '{updated_last_name}'")
+
+    except Exception as e:
+        # Step 4: Mark as Failed
+        update_csv_and_report(personnel_page, request, "PERS06", expected, False, str(e))
+        pytest.fail(f"PERS06 failed for {search_name}: {str(e)}")
+
+def test_pers07_view_personnel(page: Page, request):
+    # ------------------ Load Test Data ------------------
+    row = test_data_df[test_data_df['TC ID'] == 'PERS07'].to_dict(orient="records")[0]
+    expected = row.get("Expected Result", "N/A")
+    test_data_str = row.get("Test Data", "")
+
+    # Parse CSV Test Data
+    data_map = {}
+    for item in test_data_str.split(","):
+        if ":" in item:
+            key, val = item.split(":", 1)
+            data_map[key.strip()] = val.strip()
+
+    # Extract values
+    email = data_map.get("Email")
+    password = data_map.get("password")
+    search_name = data_map.get("search_name")
+
+    # Page objects
+    login_page = LoginPage(page)
+    personnel_page = PersonnelPage(page)
+
+    try:
+        # Step 1: Login
+        login_page.navigate()
+        login_page.login(email, password)
+
+        # Step 2: View personnel
+        personnel_page.view_personnel(search_name)
+
+        # Step 3: Mark as Passed
+        update_csv_and_report(personnel_page, request, "PERS07", expected, True)
+        print(f"✅ PERS07: Viewed personnel '{search_name}' successfully")
+
+    except Exception as e:
+        # Step 4: Mark as Failed
+        update_csv_and_report(personnel_page, request, "PERS07", expected, False, str(e))
+        pytest.fail(f"PERS07 failed for {search_name}: {str(e)}")
