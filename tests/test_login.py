@@ -1,86 +1,285 @@
+import time
 import pytest
 import pandas as pd
 import re
 import os
+from pages.password_toggle_page import PasswordTogglePage
 from pages.login_page import LoginPage
 from pytest_html import extras
+from config import CSV_FILE
+from playwright.sync_api import Page, expect
 
-CSV_FILE = "data/testdata.csv"
 
-# Read CSV once
+
+# ------------------ LOAD CSV ------------------
 test_data_df = pd.read_csv(CSV_FILE, engine="python")
 
-# -----------------------------
-# Filter rows up to TC ID = AUTH06
-end_index = test_data_df[test_data_df['TC ID'].str.strip() == 'AUTH06'].index
-if not end_index.empty:
-    end_idx = end_index[0]
-    # Slice the dataframe from top until AUTH06 (inclusive)
-    test_data_df = test_data_df.loc[:end_idx]
-else:
-    test_data_df = pd.DataFrame()  # empty if AUTH06 not found
-    print("TC ID AUTH06 not found in CSV, no tests will run.")
-# -----------------------------
 
-# Convert filtered data to dict for parametrization
-test_data = test_data_df.to_dict(orient="records")
+def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
+    """Helper to update CSV + attach screenshot if failed."""
+    last_index = test_data_df[test_data_df['TC ID'] == tcid].index[0]
+    if passed:
+        test_data_df.at[last_index, "Status"] = "Passed"
+        test_data_df.at[last_index, "Remarks"] = expected
+    else:
+        test_data_df.at[last_index, "Status"] = "Failed"
+        test_data_df.at[last_index, "Remarks"] = f"Expected: {expected} | Actual: {error}"
 
+        
+        if not os.path.exists("reports"):
+            os.makedirs("reports")
+        screenshot_path = os.path.join("reports", f"{tcid}_failure.png")
+        page_obj.take_screenshot(screenshot_path)
 
-@pytest.mark.parametrize("tc_index,tc", [(i, row) for i, row in enumerate(test_data)])
-def test_auth_and_registration(page, tc_index, tc, request):
-    login_page = LoginPage(page)
+        if hasattr(request.config, "_html"):
+            request.config._html.extra.append(extras.image(screenshot_path))
+            request.config._html.extra.append(extras.text(f"{tcid} Failed: {error}"))
 
-    # Extract email/password from Test Data column using regex
-    test_data_str = str(tc.get("Test Data", ""))
+    try:
+        test_data_df.to_csv(CSV_FILE, index=False)
+    except PermissionError:
+        temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
+        test_data_df.to_csv(temp_csv, index=False)
+
+def test_auth01_valid_login(page: Page, request):
+    """AUTH01 - Valid Login with Email and Password"""
+
+    tcid = "AUTH01"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
+
+   
+    test_data_str = str(tc_row.get("Test Data", ""))
     email_match = re.search(r"Email:\s*([^\s]+)", test_data_str)
     password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
 
     email = email_match.group(1) if email_match else ""
     password = password_match.group(1) if password_match else ""
 
-    test_passed = False
-    error_msg = ""
-    expected_result = tc.get("Expected Result", "N/A")
+    login_page = LoginPage(page)
 
     try:
-        # Navigate and perform login (up to Log-in button)
+       
         login_page.navigate("login")
+
+
         login_page.login(email, password)
 
-        # If no exception occurred, consider test passed
-        test_passed = True
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
 
     except Exception as e:
-        error_msg = f"{tc['TC ID']} Exception: {str(e)}"
-        # Take screenshot
-        if not os.path.exists("reports"):
-            os.makedirs("reports")
-        screenshot_path = os.path.join("reports", f"{tc['TC ID']}_failure.png")
-        login_page.take_screenshot(screenshot_path)
 
-        if hasattr(request.config, "_html"):
-            request.config._html.extra.append(extras.image(screenshot_path))
-            request.config._html.extra.append(extras.text(error_msg))
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
 
-    finally:
-        # Update CSV
-        last_index = test_data_df.index[tc_index]  # map to original dataframe index
-        if test_passed:
-            test_data_df.at[last_index, "Status"] = "Passed"
-            test_data_df.at[last_index, "Remarks"] = expected_result
-            if hasattr(request.config, "_html"):
-                request.config._html.extra.append(extras.text(f"{tc['TC ID']} Passed"))
-        else:
-            test_data_df.at[last_index, "Status"] = "Failed"
-            test_data_df.at[last_index, "Remarks"] = f"{expected_result} | Actual: {error_msg}"
+def test_auth02_invalid_password(page: Page, request):
+    """AUTH02 - Invalid Login with Wrong Password"""
 
-        # Save CSV safely
-        try:
-            test_data_df.to_csv(CSV_FILE, index=False)
-        except PermissionError:
-            temp_csv = CSV_FILE.replace(".csv", "_temp.csv")
-            test_data_df.to_csv(temp_csv, index=False)
+    tcid = "AUTH02"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
 
-    # Fail the test if needed
-    if not test_passed:
-        pytest.fail(error_msg)
+    
+    test_data_str = str(tc_row.get("Test Data", ""))
+    email_match = re.search(r"Email:\s*([^\s]+)", test_data_str)
+    password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
+
+    email = email_match.group(1) if email_match else ""
+    password = password_match.group(1) if password_match else ""
+
+    login_page = LoginPage(page)
+
+    try:
+
+        login_page.navigate("login")
+
+        login_page.input_email.fill(email)
+        login_page.input_password.fill(password)
+        login_page.btn_next.click()
+
+        expect(login_page.error_message).to_have_text(
+            "Invalid Credentials, Please Check Email or Password",
+            timeout=5000
+        )
+
+     
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
+
+    except Exception as e:
+        
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
+def test_auth03_invalid_nonexistent_email(page: Page, request):
+    """AUTH03 - Invalid Login with Non-existent Email"""
+
+    tcid = "AUTH03"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
+
+   
+    test_data_str = str(tc_row.get("Test Data", ""))
+    email_match = re.search(r"Email:\s*([^\s]+)", test_data_str)
+    password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
+
+    email = email_match.group(1) if email_match else ""
+    password = password_match.group(1) if password_match else ""
+
+    login_page = LoginPage(page)
+
+    try:
+       
+        login_page.navigate("login")
+
+        
+        login_page.input_email.fill(email)
+        login_page.input_password.fill(password)
+
+       
+        login_page.btn_next.click()
+
+     
+        expect(login_page.error_message).to_have_text(
+            "Invalid Credentials, Please Check Email or Password",
+            timeout=5000
+        )
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
+
+    except Exception as e:
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
+
+def test_auth04_empty_email_field(page: Page, request):
+    """AUTH04 - Empty Email Field Validation"""
+
+    tcid = "AUTH04"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
+
+   
+    test_data_str = str(tc_row.get("Test Data", ""))
+    password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
+    password = password_match.group(1) if password_match else ""
+
+    login_page = LoginPage(page)
+
+    try:
+       
+        login_page.navigate("login")
+        login_page.input_email.fill("")
+        login_page.input_password.fill(password)
+        assert not login_page.btn_next.is_enabled(), "Next button should be disabled when email is empty"
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
+
+    except Exception as e:
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
+
+def test_auth05_empty_password_field(page: Page, request):
+    """AUTH05 - Empty Password Field Validation"""
+
+    tcid = "AUTH05"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
+
+    
+    test_data_str = str(tc_row.get("Test Data", ""))
+    email_match = re.search(r"Email:\s*([^\s]+)", test_data_str)
+    email = email_match.group(1) if email_match else ""
+
+    login_page = LoginPage(page)
+
+    try:
+        login_page.navigate("login")
+        login_page.input_email.fill(email)
+        login_page.input_password.fill("")
+        assert not login_page.btn_next.is_enabled(), "Next button should be disabled when password is empty"
+
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
+
+    except Exception as e:
+       
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
+
+def test_auth06_invalid_email_format(page: Page, request):
+    """AUTH06 - Invalid Email Format Validation"""
+
+    tcid = "AUTH06"
+    tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
+    expected_result = tc_row["Expected Result"]
+
+
+    test_data_str = str(tc_row.get("Test Data", ""))
+    email_match = re.search(r"Email:\s*([^\s]+)", test_data_str)
+    password_match = re.search(r"Password:\s*([^\s]+)", test_data_str)
+
+    email = email_match.group(1) if email_match else ""
+    password = password_match.group(1) if password_match else ""
+
+    login_page = LoginPage(page)
+
+    try:
+      
+        login_page.navigate("login")
+
+        login_page.input_email.fill(email)
+
+        login_page.input_password.fill(password)
+
+        login_page.btn_next.click()
+
+        expect(login_page.error_message).to_have_text(
+            "Invalid Credentials, Please Check Email or Password",
+            timeout=5000
+        )
+
+
+        update_csv_and_report(login_page, request, tcid, expected_result, passed=True)
+
+    except Exception as e:
+ 
+        update_csv_and_report(
+            login_page,
+            request,
+            tcid,
+            expected_result,
+            passed=False,
+            error=str(e)
+        )
+        pytest.fail(f"{tcid} Exception: {str(e)}")
+

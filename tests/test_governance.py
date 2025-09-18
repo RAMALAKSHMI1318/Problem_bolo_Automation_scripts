@@ -63,17 +63,17 @@ def test_gov01_ministry_upload(page: Page, request):
     governance_page = GovernancePage(page)
 
     try:
-        # Step 1: Login
+        
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate Governance & Upload
+        
         governance_page.navigate_to_governance()
         governance_page.select_location(country, state, district, city)
         governance_page.upload_btn.click()
         governance_page.upload_ministry_file(ministry_file)
 
-        # Mark as passed
+        
         update_csv_and_report(page, request, "GOV01", expected, True)
 
     except Exception as e:
@@ -81,7 +81,7 @@ def test_gov01_ministry_upload(page: Page, request):
         raise
 
 def test_gov02_add_governance(page: Page, request):
-    # ------------------ Load Test Data ------------------
+   
     row = test_data_df[test_data_df['TC ID'] == 'GOV02'].to_dict(orient="records")[0]
     expected = row.get("Expected", "Governance roles created")
     data_map = {}
@@ -104,29 +104,25 @@ def test_gov02_add_governance(page: Page, request):
     governance_page = GovernancePage(page)
 
     try:
-        # Step 1: Login
+        
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate Governance
+        
         governance_page.navigate_to_governance()
         governance_page.select_location(country, state, district, city)
 
-        # Step 3: Upload Ministry file
+        
         governance_page.upload_btn.click()
         governance_page.upload_ministry_file(ministry_file)
 
 
-        # Step 4: Upload Roles file
+        
         governance_page.upload_roles_file(roles_file)
 
-        # Step 5: Optionally continue with further steps
-
-        # ------------------ Update CSV/Report as Success ------------------
         update_csv_and_report(page, request, "GOV02", expected, True)
 
     except Exception as e:
-        # ------------------ Update CSV/Report as Failure ------------------
         update_csv_and_report(page, request, "GOV02", expected, False, str(e))
         raise
 
@@ -150,30 +146,26 @@ def test_gov03_upload_governance(page: Page,request):
     city = data_map.get("city")
     ministry_file = data_map.get("MinistryFile")
     roles_file = data_map.get("RolesFile")
-    officers_file = data_map.get("OfficersFile")  # Add to CSV if needed
+    officers_file = data_map.get("OfficersFile") 
 
-    # ------------------ Page Objects ------------------
     login_page = LoginPage(page)
     governance_page = GovernancePage(page)
 
     try:
-        # Step 1: Login
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate Governance
         governance_page.navigate_to_governance()
         governance_page.select_location(country, state, district, city)
         governance_page.upload_btn.click()
 
-        # Step 3: Upload Ministry file
+        
         governance_page.upload_ministry_file(ministry_file)
         time.sleep(3)
-        # Step 4: Upload Roles file
+        
         governance_page.upload_roles_file(roles_file)
         time.sleep(3)
 
-        # Step 5: Upload Officers file (if provided)
         if officers_file:
             governance_page.upload_officers_file(officers_file)
 
@@ -265,7 +257,7 @@ def test_gov05_edit_governance(page: Page, request):
         raise
 
 def test_gov06_update_roles(page: Page, request):
-    # GOV06 row only
+    
     row6 = test_data_df[test_data_df['TC ID'] == 'GOV06'].to_dict(orient="records")[0]
     expected6 = row6.get("Expected", "Governance roles updated")
 
@@ -288,22 +280,20 @@ def test_gov06_update_roles(page: Page, request):
     governance_page = GovernancePage(page)
 
     try:
-        # Step 1: Login
+        
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate Governance
+        
         governance_page.navigate_to_governance()
         governance_page.select_location(country, state, district, city)
 
-        # Step 3: Update Ministry (process of GOV05 but no GOV05 CSV update)
+        
         governance_page.update_governance_body(updated_ministry_file)
 
-        # Step 4: Update Roles (GOV06)
+        
         governance_page.update_roles_file(updated_roles_file)
         
-
-        # ✅ Only GOV06 marked in CSV
         update_csv_and_report(page, request, "GOV06", expected6, passed=True)
 
     except Exception as e:
@@ -311,7 +301,7 @@ def test_gov06_update_roles(page: Page, request):
         raise
 
 def test_gov07_view_governance(page: Page, request):
-    # Fetch GOV07 row from CSV
+  
     row = test_data_df[test_data_df['TC ID'] == 'GOV07'].to_dict(orient="records")[0]
     expected = row.get("Expected", "Complete governance structure displayed")
 
@@ -328,26 +318,21 @@ def test_gov07_view_governance(page: Page, request):
     district = data_map.get("district")
     city = data_map.get("city")
 
-    # Initialize page objects
     login_page = LoginPage(page)
     governance_page = GovernancePage(page)
 
     try:
-        # Step 1: Login
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate to Governance page and select location
         governance_page.navigate_to_governance()
         governance_page.select_location(country, state, district, city)
 
-        # Step 3: Perform view governance actions
         governance_page.view_governance()
 
-        # Step 4: Update CSV as Passed
         update_csv_and_report(page, request, "GOV07", expected, passed=True)
 
     except Exception as e:
-        # Step 5: Update CSV as Failed with screenshot
+       
         update_csv_and_report(page, request, "GOV07", expected, passed=False, error=str(e))
         raise

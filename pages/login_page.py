@@ -23,32 +23,29 @@ class LoginPage(BasePage):
         self.tab_settings = page.locator("button[role='tab']", has_text="Settings")
         self.tab_account_settings = page.get_by_role("tab", name="Account Settings")
         self.btn_logout = page.get_by_role("button", name="Click here to Logout")
+        self.error_message = page.locator("div.MuiAlert-message")
 
     def login(self, email: str, password: str):
-        # Go to Login tab
+        
         self.tab_login.click()
 
-        # Fill credentials
+       
         self.input_email.fill(email)
         self.input_password.fill(password)
 
-        # First Next
         self.btn_next.click()
 
-        # Second Next
         expect(self.btn_next).to_be_enabled(timeout=10000)
         time.sleep(1)
         self.btn_next.click()
 
-        # --- OTP Step ---
         expect(self.otp_message).to_be_visible(timeout=10000)
-        otp_text = self.otp_message.inner_text().strip()   # "OTP: BLFJ"
-        otp_value = otp_text.split(":")[-1].strip()        # "BLFJ"
+        otp_text = self.otp_message.inner_text().strip()  
+        otp_value = otp_text.split(":")[-1].strip()  
 
-        # Fill each OTP character in input boxes
+       
         for idx, char in enumerate(otp_value):
             self.otp_inputs.nth(idx).fill(char)
 
-        # Now Log-in
         expect(self.btn_login).to_be_visible(timeout=10000)
         self.btn_login.click()

@@ -25,7 +25,7 @@ def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
         test_data_df.at[last_index, "Status"] = "Failed"
         test_data_df.at[last_index, "Remarks"] = f"Expected: {expected} | Actual: {error}"
 
-        # Screenshot for failed step
+        
         if not os.path.exists("reports"):
             os.makedirs("reports")
         screenshot_path = os.path.join("reports", f"{tcid}_failure.png")
@@ -109,7 +109,7 @@ def test_auth11_verify_email_in_otp_tab(page, request):
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # Extract email from Test Data
+    
     email = ""
     if "Email:" in test_data_str:
         email = test_data_str.split("Email:")[1].strip()
@@ -117,7 +117,7 @@ def test_auth11_verify_email_in_otp_tab(page, request):
     login_page = LoginPage(page)
 
     try:
-        # OTP tab is assumed open after AUTH10
+        
         email_locator = page.get_by_text(email, exact=True)
         assert email_locator.is_visible(), f"Email {email} not visible on OTP tab"
         update_csv_and_report(login_page, request, "AUTH11", expected, True)
@@ -131,7 +131,7 @@ def test_auth15_otp_input_ui(page, request):
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # ✅ Extract Email & Password directly using regex
+   
     import re
     email_match = re.search(r"Email:\s*([^\s]+)", test_data_str, re.IGNORECASE)
     password_match = re.search(r"Password:\s*([^\s]+)", test_data_str, re.IGNORECASE)
@@ -142,38 +142,35 @@ def test_auth15_otp_input_ui(page, request):
     login_page = LoginPage(page)
 
     try:
-        # Navigate and perform login steps
+       
         login_page.navigate()
         login_page.tab_login.click()
 
-        # Enter email
+        
         login_page.input_email.fill(email)
         expect(login_page.input_password).to_be_visible(timeout=5000)
         login_page.input_password.fill(password)
 
-        # Click Next
+        
         login_page.btn_next.click()
 
-        # Wait until Next becomes enabled and click again
+        # 
         expect(login_page.btn_next).to_be_enabled(timeout=10000)
-        page.wait_for_timeout(1000)  # small wait for UI stability
+        page.wait_for_timeout(1000)  
         login_page.btn_next.click()
 
-        # ✅ OTP input boxes should appear
         otp_inputs = page.locator("input[type='text'][maxlength='1']")
         expect(otp_inputs).to_have_count(4, timeout=5000)
 
-        # Verify each OTP box is visible (ignore values)
         for i in range(4):
             expect(otp_inputs.nth(i)).to_be_visible()
             print(f"✅ OTP input {i+1} is visible")
 
-        # (Optional) Check focus on first OTP input
+        
         focused = page.evaluate(
             "document.activeElement === document.querySelector('input[type=text][maxlength=\"1\"]')"
         )
 
-        # Passed
         update_csv_and_report(login_page, request, "AUTH15", expected, True)
 
     except Exception as e:
@@ -187,7 +184,6 @@ def test_auth16_otp_input_validation(page, request):
     test_data_str = str(row.get("Test Data", ""))
 
     import re
-    # Extract Email, Password, OTP from CSV
     email_match = re.search(r"Email:\s*([^\s]+)", test_data_str, re.IGNORECASE)
     password_match = re.search(r"Password:\s*([^\s,]+)", test_data_str, re.IGNORECASE)
     otp_match = re.search(r"OTP:\s*([^\s]+)", test_data_str, re.IGNORECASE)
@@ -208,34 +204,34 @@ def test_auth16_otp_input_validation(page, request):
 
         login_page.btn_next.click()
         expect(login_page.btn_next).to_be_enabled(timeout=10000)
-        page.wait_for_timeout(1000)  # small wait for UI stability
+        page.wait_for_timeout(1000) 
         login_page.btn_next.click()
 
-        # -------------------- Step 2: OTP input --------------------
+        
         otp_inputs = page.locator("input[type='text'][maxlength='1']")
         expect(otp_inputs).to_have_count(len(otp_value), timeout=5000)
 
-        # Clear and type OTP from CSV
+        
         for i in range(len(otp_value)):
             otp_input = otp_inputs.nth(i)
             otp_input.fill("")
             otp_input.press("Backspace")
             otp_input.type(otp_value[i])
 
-        # -------------------- Step 3: Validate OTP --------------------
+        
         all_valid = True
         for i, char in enumerate(otp_value):
             entered_char = otp_inputs.nth(i).input_value()
-            if not char.isalnum() and entered_char != "":  # ❌ invalid char accepted
+            if not char.isalnum() and entered_char != "":  
                 all_valid = False
                 print(f"❌ Invalid character '{entered_char}' was incorrectly accepted at OTP box {i+1}")
             else:
                 print(f"✅ OTP box {i+1} is correct (entered '{entered_char}')")
 
-        # -------------------- Step 4: Update CSV/report --------------------
+       
         update_csv_and_report(login_page, request, "AUTH16", expected, all_valid)
 
-        # Fail test only if an invalid char was accepted
+        
         if not all_valid:
             pytest.fail("AUTH16 failed - special characters were accepted")
 
@@ -250,7 +246,7 @@ def test_auth12_otp_auto_focus(page, request):
     test_data_str = str(row.get("Test Data", ""))
 
     import re
-    # Extract Email, Password, OTP from CSV
+    
     email_match = re.search(r"Email:\s*([^\s]+)", test_data_str, re.IGNORECASE)
     password_match = re.search(r"Password:\s*([^\s,]+)", test_data_str, re.IGNORECASE)
     otp_match = re.search(r"OTP:\s*([^\s]+)", test_data_str, re.IGNORECASE)
@@ -262,7 +258,7 @@ def test_auth12_otp_auto_focus(page, request):
     login_page = LoginPage(page)
 
     try:
-        # -------------------- Step 1: Login --------------------
+        
         login_page.navigate()
         login_page.tab_login.click()
         login_page.input_email.fill(email)
@@ -274,21 +270,21 @@ def test_auth12_otp_auto_focus(page, request):
         page.wait_for_timeout(1000)
         login_page.btn_next.click()
 
-        # -------------------- Step 2: OTP input --------------------
+       
         otp_inputs = page.locator('input[type="text"][maxlength="1"]')
         expect(otp_inputs).to_have_count(len(otp_value), timeout=5000)
 
-        # Clear any pre-filled OTP
+       
         for i in range(len(otp_value)):
             otp_inputs.nth(i).fill("")
             otp_inputs.nth(i).press("Backspace")
 
-        # -------------------- Step 3: Type OTP & check auto-focus --------------------
+       
         auto_focus_passed = True
         for i, char in enumerate(otp_value):
             otp_inputs.nth(i).type(char)
 
-            # Check focus moves to next input (except last box)
+            
             if i < len(otp_value) - 1:
                 focused_index = page.evaluate(
                     'Array.from(document.querySelectorAll(\'input[type="text"][maxlength="1"]\')).indexOf(document.activeElement)'
@@ -364,12 +360,12 @@ def test_auth13_otp_backspace(page, request):
         backspace_worked = True
         for i in range(len(otp_value)-1, 0, -1):  # Start from last OTP box
             otp_input = otp_inputs.nth(i)
-            otp_input.fill("")            # Clear the box
-            page.wait_for_timeout(50)     # small delay for UI
-            otp_input.press("Backspace")  # Press Backspace
-            otp_input.press("Backspace")  # Press again to ensure event fires
+            otp_input.fill("")            
+            page.wait_for_timeout(50)     
+            otp_input.press("Backspace")  
+            otp_input.press("Backspace") 
 
-            # Check if focus moved to previous box
+           
             active_index = page.evaluate("""
                 () => Array.from(document.querySelectorAll('input[type="text"][maxlength="1"]'))
                       .indexOf(document.activeElement)
@@ -380,7 +376,7 @@ def test_auth13_otp_backspace(page, request):
             else:
                 print(f"✅ Focus correctly moved to OTP box {i}")
 
-        # Step 6: Update CSV/report
+       
         update_csv_and_report(login_page, request, "AUTH13", expected, backspace_worked)
 
         if not backspace_worked:
@@ -391,7 +387,7 @@ def test_auth13_otp_backspace(page, request):
         pytest.fail("AUTH13 failed")
 
 def test_auth14_resend_otp_timer(page, request):
-    # Get test data for AUTH14
+   
     rows = test_data_df[test_data_df['TC ID'] == 'AUTH14'].to_dict(orient="records")
     if not rows:
         pytest.skip("AUTH14 test data not found in CSV")
@@ -399,7 +395,7 @@ def test_auth14_resend_otp_timer(page, request):
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # Extract email and password
+    
     email, password = "", ""
     for line in test_data_str.splitlines():
         if line.strip().lower().startswith("email:"):
@@ -410,25 +406,24 @@ def test_auth14_resend_otp_timer(page, request):
     login_page = LoginPage(page)
 
     try:
-        # Step 1: Navigate & login
+        
         login_page.navigate()
         login_page.tab_login.click()
         login_page.input_email.fill(email)
         login_page.input_password.fill(password)
         login_page.btn_next.click()
         page.wait_for_timeout(1000)
-        login_page.btn_next.click()  # Navigate to OTP tab
+        login_page.btn_next.click() 
 
-        # Step 2: Wait 20 seconds (timer countdown)
+       
         print("⏳ Waiting 20 seconds for countdown...")
         page.wait_for_timeout(20000)
 
-        # Step 3: Verify Resend button is visible and enabled
+       
         expect(login_page.resend_button).to_be_visible(timeout=5000)
         expect(login_page.resend_button).to_be_enabled()
         print("✅ Resend button is visible and enabled after 20 seconds")
 
-        # Step 4: Update CSV/report
         update_csv_and_report(login_page, request, "AUTH14", expected, True)
 
     except Exception as e:
@@ -436,7 +431,7 @@ def test_auth14_resend_otp_timer(page, request):
         pytest.fail("AUTH14 failed")
 
 def test_auth17_keyboard_navigation(page, request):
-    # Get test data for AUTH17
+    
     rows = test_data_df[test_data_df['TC ID'] == 'AUTH17'].to_dict(orient="records")
     if not rows:
         pytest.skip("AUTH17 test data not found in CSV")
@@ -444,7 +439,7 @@ def test_auth17_keyboard_navigation(page, request):
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # Extract email and password
+    
     email, password = "", ""
     for line in test_data_str.splitlines():
         if line.strip().lower().startswith("email:"):
@@ -455,23 +450,23 @@ def test_auth17_keyboard_navigation(page, request):
     login_page = LoginPage(page)
 
     try:
-        # Step 1: Navigate to login
+        
         login_page.navigate()
         login_page.tab_login.click()
 
-        # Step 2: Fill credentials
+       
         login_page.input_email.fill(email)
         login_page.input_password.fill(password)
 
-        # Step 3: First Enter → should navigate to Send OTP tab
+       
         login_page.input_password.press("Enter")
 
-        # Step 4: Verify masked email text is displayed
+        
         expect(login_page.masked_email).to_be_visible(timeout=5000)
         email_text = login_page.masked_email.inner_text()
         print(f"✅ Masked email text is visible: {email_text}")
 
-        # Step 5: Update CSV/report
+        
         update_csv_and_report(login_page, request, "AUTH17", expected, True)
 
     except Exception as e:
@@ -497,11 +492,11 @@ def test_auth18_logout_functionality(page, request):
     login_page = LoginPage(page)
 
     try:
-        # Step 1: Login
+       
         login_page.navigate()
         login_page.login(email, password)
 
-        # Step 2: Navigate dashboard and click logout
+       
         login_page.btn_get_started.click()
         login_page.btn_admin_menu.click()
         login_page.tab_settings.click()
@@ -510,7 +505,6 @@ def test_auth18_logout_functionality(page, request):
         login_page.btn_logout.wait_for(state="visible", timeout=10000)
         login_page.btn_logout.click()
 
-        # Step 3: Update report (without verification)
         update_csv_and_report(login_page, request, "AUTH18", expected, True)
         print("✅ AUTH18: Logout clicked (no verification)")
 
