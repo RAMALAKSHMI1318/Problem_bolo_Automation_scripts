@@ -1,7 +1,7 @@
 # config.py
 import os
 
-BASE_URL = "http://192.168.1.8:5173/"
+BASE_URL = "http://192.168.1.23:5173/"
 BROWSER = "chromium"      # chromium | firefox | webkit
 TIMEOUT = 60000           # ms
 
