@@ -7,18 +7,18 @@ class PersonnelPage(BasePage):
     def __init__(self, page: Page):
         super().__init__(page)
 
-        # --- Dashboard / navigation ---
+      
         self.btn_get_started = page.get_by_role("button", name="Get Started")
         self.btn_personnel = page.get_by_role("button", name="Personnel")
         self.btn_add_personnel = page.get_by_role("button", name="+ Add Personnel")
 
-        # --- Step 1: Organization type ---
+        
         self.dropdown_org_type = page.get_by_label("", exact=True)
         self.option_governance = page.get_by_role("option", name="Governance")
         self.option_administrator = page.get_by_role("option", name="Administrator")
 
 
-        # --- Step 2: Location selectors ---
+       
         self.cmb_country = page.get_by_role("combobox").nth(0)
         self.option_india = page.get_by_role("option", name="India")
 
@@ -31,7 +31,7 @@ class PersonnelPage(BasePage):
         self.cmb_area = page.get_by_role("combobox").nth(3)
         self.option_hydcity = page.get_by_role("option", name="HyderabadCity")
 
-        # --- Step 3: Personnel details ---
+     
         self.input_first_name = page.get_by_placeholder("Enter First Name")
         self.input_last_name = page.get_by_placeholder("Enter Last Name")
         self.input_phone = page.locator("input[type='tel']")
@@ -39,7 +39,7 @@ class PersonnelPage(BasePage):
         self.input_empid = page.get_by_role("textbox", name="Enter Emp-id")
         self.input_address = page.get_by_role("textbox", name="Enter Address")
 
-        # --- Navigation buttons ---
+        
         self.btn_next = page.get_by_role("button", name="Next")
         self.btn_done = page.get_by_role("button", name="Done")
         self.profile_admin = page.get_by_text("ProfileAdministrator")
@@ -48,12 +48,12 @@ class PersonnelPage(BasePage):
         self.input_search_personnel = page.get_by_role("textbox", name="Search Personnel")
         self.btn_edit_personnel_icon = page.get_by_role("button", name="primaryEditIcon")
         self.txt_edit_personnel_header = page.get_by_text("Edit PersonnelAuto Saved To")
-        self.input_last_name_edit = page.get_by_role("textbox").nth(1)   # based on your steps
+        self.input_last_name_edit = page.get_by_role("textbox").nth(1)   
         self.btn_edit_personnel_submit = page.get_by_role("button", name="Edit Personnel")
         self.btn_view_personnel = page.get_by_role("button", name="primaryEyeIcon")
         self.btn_close_view = page.get_by_role("button", name="Close")
 
-    # ---------------- ACTION METHODS ----------------
+   
     def navigate_to_personnel(self):
         self.btn_get_started.click()
         self.btn_personnel.click()
@@ -80,10 +80,14 @@ class PersonnelPage(BasePage):
         self.input_last_name.fill(last_name)
         self.input_phone.fill(phone)
         self.input_email.fill(email)
+        combobox = self.page.get_by_role("combobox")
+        combobox.click()
+
+        self.page.get_by_role("option", name="Female").click()
         self.input_empid.fill(empid)
         self.input_address.fill(address)
 
-        # Navigate next and save
+      
         self.btn_next.click()
         time.sleep(1)
         self.btn_next.click()
@@ -110,7 +114,7 @@ class PersonnelPage(BasePage):
         else:
             self.option_administrator.click()
 
-        # Step 3: Select Location
+       
         self.btn_next.click()
         self.cmb_country.click()
         self.option_india.click()
@@ -137,22 +141,57 @@ class PersonnelPage(BasePage):
         self.page.get_by_role("option", name=institution_name).click()
 
     def edit_personnel(self, search_name: str, updated_last_name: str):
-    # Step 1: Navigate to Personnel
+        print(f"✏️ Editing personnel: {search_name}")
+
+    
         self.btn_get_started.click()
         self.btn_personnel.click()
+
+   
         self.input_search_personnel.click()
         self.input_search_personnel.fill(search_name)
-        self.btn_edit_personnel_icon.click()
-        self.txt_edit_personnel_header.wait_for()
+        self.page.keyboard.press("Enter")
+        self.page.wait_for_timeout(1500)
+
+        edit_buttons = self.page.get_by_role("button", name="primaryEditIcon")
+        if edit_buttons.count() == 0:
+            print("❌ No edit buttons found after search.")
+            return
+
+        edit_buttons.first.click()
+        print("🖊 Clicked the first Edit button.")
+
+
+   
+        self.txt_edit_personnel_header.wait_for(state="visible", timeout=5000)
         self.input_last_name_edit.click()
         self.input_last_name_edit.fill(updated_last_name)
         self.btn_edit_personnel_submit.click()
+        print(f"✅ Updated last name to '{updated_last_name}'")
+
 
     def view_personnel(self, search_name: str):
+        print(f"👁 Viewing personnel: {search_name}")
+
+   
         self.btn_get_started.click()
         self.btn_personnel.click()
+
+    
         self.input_search_personnel.click()
         self.input_search_personnel.fill(search_name)
-        self.btn_view_personnel.click()
+        self.page.keyboard.press("Enter")
+        self.page.wait_for_timeout(1500)
+
+    
+        view_buttons = self.page.get_by_role("button", name="primaryEyeIcon")
+        if view_buttons.count() == 0:
+            print("❌ No view buttons found after search.")
+            return
+
+        view_buttons.first.click()
+        print("✅ Clicked the first View button.")
+
+        self.btn_close_view.wait_for(state="visible", timeout=5000)
         self.btn_close_view.click()
-       
+        print("❎ Closed the view dialog.")

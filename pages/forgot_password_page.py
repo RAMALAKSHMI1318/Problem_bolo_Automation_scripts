@@ -4,7 +4,7 @@ from playwright.sync_api import expect
 class ForgotPasswordPage(BasePage):
     """Page object for Forgot Password functionality"""
 
-    # ----------------- Locators -----------------
+    
     LOGIN_TAB = "tab[name='Login/Signin']"
     FORGOT_PASSWORD_BUTTON = "button[name='Forgot Password?']"
     FORGOT_PASSWORD_HEADING = "text=Forgot Password"
@@ -31,7 +31,7 @@ class ForgotPasswordPage(BasePage):
     OTP_INPUTS = "input[type='text'][maxlength='1']"  # 4 OTP inputs
     BACK_TO_HOME_BUTTON = "button:has-text('Back to Home')"
 
-    # ----------------- Actions -----------------
+   
     def click_login_tab(self):
         self.page.get_by_role("tab", name="Login/Signin").click()
 
@@ -47,7 +47,7 @@ class ForgotPasswordPage(BasePage):
     def click_cross_button(self):
         self.page.get_by_role("button").first.click()  
 
-    # ----------------- FPASS03 Actions -----------------
+    
     def is_mobile_input_visible(self) -> bool:
         locator = self.page.locator(self.MOBILE_INPUT)
         expect(locator).to_be_visible(timeout=5000)

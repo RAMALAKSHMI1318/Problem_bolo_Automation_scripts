@@ -9,7 +9,9 @@ from config import CSV_FILE
 from pytest_html import extras
 from playwright.sync_api import Page
 
-# ------------------ LOAD CSV ------------------
+from utils.allure_helper import AllureHelper
+
+
 test_data_df = pd.read_csv(CSV_FILE, engine="python")
 
 
@@ -41,12 +43,15 @@ def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
 
 
 def test_pers02_add_personnel(page: Page, request):
-    # ------------------ Load Test Data ------------------
+
+    tcid="PERS02"
+    AllureHelper.attach_description(tcid)
+    
     row = test_data_df[test_data_df['TC ID'] == 'PERS02'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = row.get("Test Data", "")
 
-    # ------------------ Parse Test Data safely ------------------
+   
     data_map = {}
     for item in test_data_str.split(","):
         if ":" in item:
@@ -95,6 +100,9 @@ def test_pers02_add_personnel(page: Page, request):
         pytest.fail(f"PERS02 failed: {str(e)}")
 
 def test_pers03_select_profile(page: Page, request):
+
+    tcid="PERS03"
+    AllureHelper.attach_description(tcid)
     
     row = test_data_df[test_data_df['TC ID'] == 'PERS03'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
@@ -110,7 +118,7 @@ def test_pers03_select_profile(page: Page, request):
     
     email = data_map.get("Email")
     password = data_map.get("password")
-    org_type = data_map.get("profileType", "Governance")  # Governance/Administrator
+    org_type = data_map.get("profileType", "Governance")  
 
     
     login_page = LoginPage(page)
@@ -139,7 +147,10 @@ def test_pers03_select_profile(page: Page, request):
         pytest.fail(f"PERS03 failed: {str(e)}")
 
 def test_pers04_assign_jurisdiction(page: Page, request):
-    # ------------------ Load Test Data ------------------
+
+    tcid="PERS04"
+    AllureHelper.attach_description(tcid)
+   
     row = test_data_df[test_data_df['TC ID'] == 'PERS04'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = row.get("Test Data", "")
@@ -182,7 +193,10 @@ def test_pers04_assign_jurisdiction(page: Page, request):
         pytest.fail(f"PERS04 failed for {email}: {str(e)}")
 
 def test_pers05_institution_assignment(page: Page, request):
-    # ------------------ Load Test Data ------------------
+
+    tcid="PERS05"
+    AllureHelper.attach_description(tcid)
+   
     row = test_data_df[test_data_df['TC ID'] == 'PERS05'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = row.get("Test Data", "")
@@ -222,7 +236,10 @@ def test_pers05_institution_assignment(page: Page, request):
 
 
 def test_pers06_edit_personnel(page: Page, request):
-    # ------------------ Load Test Data ------------------
+
+    tcid="PERS06"
+    AllureHelper.attach_description(tcid)
+   
     row = test_data_df[test_data_df['TC ID'] == 'PERS06'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = row.get("Test Data", "")
@@ -231,7 +248,7 @@ def test_pers06_edit_personnel(page: Page, request):
     data_map = {}
     for item in test_data_str.split(","):
         if ":" in item or "=" in item:
-            key, val = item.replace("=", ":").split(":", 1)  # normalize separator
+            key, val = item.replace("=", ":").split(":", 1)  
             data_map[key.strip()] = val.strip()
 
     
@@ -262,7 +279,9 @@ def test_pers06_edit_personnel(page: Page, request):
         pytest.fail(f"PERS06 failed for {search_name}: {str(e)}")
 
 def test_pers07_view_personnel(page: Page, request):
-    # ------------------ Load Test Data ------------------
+    tcid="PERS07"
+    AllureHelper.attach_description(tcid)
+   
     row = test_data_df[test_data_df['TC ID'] == 'PERS07'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = row.get("Test Data", "")

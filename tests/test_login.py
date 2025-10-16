@@ -3,15 +3,16 @@ import pytest
 import pandas as pd
 import re
 import os
-from pages.password_toggle_page import PasswordTogglePage
 from pages.login_page import LoginPage
 from pytest_html import extras
 from config import CSV_FILE
 from playwright.sync_api import Page, expect
 
+from utils.allure_helper import AllureHelper
 
 
-# ------------------ LOAD CSV ------------------
+
+
 test_data_df = pd.read_csv(CSV_FILE, engine="python")
 
 
@@ -45,6 +46,7 @@ def test_auth01_valid_login(page: Page, request):
     """AUTH01 - Valid Login with Email and Password"""
 
     tcid = "AUTH01"
+    AllureHelper.attach_description(tcid)
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 
@@ -83,6 +85,7 @@ def test_auth02_invalid_password(page: Page, request):
     """AUTH02 - Invalid Login with Wrong Password"""
 
     tcid = "AUTH02"
+    AllureHelper.attach_description(tcid)
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 
@@ -127,6 +130,7 @@ def test_auth03_invalid_nonexistent_email(page: Page, request):
     """AUTH03 - Invalid Login with Non-existent Email"""
 
     tcid = "AUTH03"
+    AllureHelper.attach_description(tcid)
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 
@@ -173,6 +177,8 @@ def test_auth04_empty_email_field(page: Page, request):
     """AUTH04 - Empty Email Field Validation"""
 
     tcid = "AUTH04"
+    AllureHelper.attach_description(tcid)
+
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 
@@ -206,6 +212,7 @@ def test_auth05_empty_password_field(page: Page, request):
     """AUTH05 - Empty Password Field Validation"""
 
     tcid = "AUTH05"
+    AllureHelper.attach_description(tcid)
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 
@@ -240,6 +247,7 @@ def test_auth06_invalid_email_format(page: Page, request):
     """AUTH06 - Invalid Email Format Validation"""
 
     tcid = "AUTH06"
+    AllureHelper.attach_description(tcid)
     tc_row = test_data_df[test_data_df['TC ID'] == tcid].iloc[0]
     expected_result = tc_row["Expected Result"]
 

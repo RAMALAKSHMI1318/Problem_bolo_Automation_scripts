@@ -25,7 +25,7 @@ def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
         test_data_df.at[last_index, "Status"] = "Failed"
         test_data_df.at[last_index, "Remarks"] = f"Expected: {expected} | Actual: {error}"
 
-        # Screenshot for failed step
+       
         if not os.path.exists("reports"):
             os.makedirs("reports")
         screenshot_path = os.path.join("reports", f"{tcid}_failure.png")
@@ -43,82 +43,81 @@ def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
 
 
 def test_fpass01_click_forgot_password(page, request):
-    # Get test data for FPASS01 from CSV
+   
     row = test_data_df[test_data_df['TC ID'] == 'FPASS01'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
 
-    # Create page object
+  
     fp_page = ForgotPasswordPage(page)
 
     try:
-        # Navigate and click login tab
+      
         fp_page.navigate()
         fp_page.click_login_tab()
 
-        # Click Forgot Password button
+       
         fp_page.click_forgot_password_button()
 
-        # If successful, update CSV as Passed
+       
         update_csv_and_report(fp_page, request, "FPASS01", expected, True)
 
     except Exception as e:
-        # If failed, update CSV as Failed and take screenshot
+       
         update_csv_and_report(fp_page, request, "FPASS01", expected, False, str(e))
         pytest.fail("FPASS01 failed")
 
 def test_fpass02_check_forgot_password_title(page, request):
-    # Get test data for FPASS02 from CSV
+    
     row = test_data_df[test_data_df['TC ID'] == 'FPASS02'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # Create page object
     fp_page = ForgotPasswordPage(page)
 
     try:
-        # Fresh start: navigate and open Forgot Password modal
+        
         fp_page.navigate()
         fp_page.click_login_tab()
         fp_page.click_forgot_password_button()
 
-        # Directly locate the modal title and assert visibility
+        
         title_locator = page.get_by_text("Forgot Password", exact=True)
         assert title_locator.is_visible(), f"Forgot Password title not visible. Test Data: {test_data_str}"
 
-        # Update CSV as Passed
+        
         update_csv_and_report(fp_page, request, "FPASS02", expected, True)
 
     except Exception as e:
-        # Update CSV as Failed and take screenshot
+        
         update_csv_and_report(fp_page, request, "FPASS02", expected, False, str(e))
         pytest.fail("FPASS02 failed")
 
 def test_fpass03_verify_forgot_password_details(page, request):
-    # 🔄 Get test data for FPASS03 from CSV
+    
     row = test_data_df[test_data_df['TC ID'] == 'FPASS03'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
-    # Extract the "Or" text from Test Data column
+    
     or_text = test_data_str.strip() if test_data_str else "Or"
 
     fp_page = ForgotPasswordPage(page)
 
     try:
-        # Open Forgot Password modal
+        
         fp_page.navigate()
         fp_page.click_login_tab()
         fp_page.click_forgot_password_button()
 
-        # Verify form elements
+        
         assert fp_page.is_mobile_input_visible(), "Mobile input not visible"
         assert fp_page.is_email_input_visible(), "Email input not visible"
 
-        # Verify "Or" separator dynamically from CSV
+        
         or_locator = page.get_by_text(or_text, exact=True)
         assert or_locator.is_visible(), f"'{or_text}' separator not visible"
 
-        # Update CSV as Passed
+       
         update_csv_and_report(fp_page, request, "FPASS03", expected, True)
 
     except Exception as e:
@@ -126,7 +125,8 @@ def test_fpass03_verify_forgot_password_details(page, request):
         pytest.fail("FPASS03 failed")
 
 def test_fpass04_enter_mobile_and_click_next(page, request):
-    # Get test data for FPASS04 from CSV
+    
+    
     row = test_data_df[test_data_df['TC ID'] == 'FPASS04'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))

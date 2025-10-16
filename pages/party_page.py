@@ -6,7 +6,7 @@ class PartyPage:
         self.get_started_btn = page.get_by_role("button", name="Get Started")
         self.party_btn = page.get_by_role("button", name="Party")
         self.add_party_btn = page.get_by_role("button", name="+ Add Party")
-        # 🎯 target only file input, not label or button
+      
         self.logo_input = page.locator("input[type='file']")
         self.name_input = page.get_by_role("textbox").first
         self.code_input = page.get_by_role("textbox").nth(1)
@@ -44,7 +44,7 @@ class PartyPage:
         # self.page.get_by_role("combobox").nth(3).click()
         # self.page.get_by_role("option", name=city).click()
 
-        # Final steps
+      
         self.next_btn.click()
         self.next_btn.click()
         self.back_to_home_btn.click()
@@ -58,7 +58,11 @@ class PartyPage:
         self.name_input.press("ArrowRight")
         self.name_input.fill(updated_name)
 
-        self.edit_party_btn.click()
+        self.next_btn.click()
+        self.next_btn.click()
+        self.next_btn.click()
+        self.back_to_home_btn.click()
+
 
     def view_party(self):
         self.view_icon.click()

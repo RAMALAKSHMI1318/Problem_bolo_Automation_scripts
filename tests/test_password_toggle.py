@@ -9,9 +9,11 @@ from pytest_html import extras
 from config import CSV_FILE
 from playwright.sync_api import Page, expect
 
+from utils.allure_helper import AllureHelper
 
 
-# ------------------ LOAD CSV ------------------
+
+
 test_data_df = pd.read_csv(CSV_FILE, engine="python")
 
 
@@ -42,8 +44,10 @@ def update_csv_and_report(page_obj, request, tcid, expected, passed, error=""):
         test_data_df.to_csv(temp_csv, index=False)
 
 
-# ------------------ AUTH07 ------------------
+
 def test_auth07_login_tab(page, request):
+    tcid="AUTH07"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH07'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     password_page = PasswordTogglePage(page)
@@ -56,8 +60,10 @@ def test_auth07_login_tab(page, request):
         update_csv_and_report(password_page, request, "AUTH07", expected, False, str(e))
         pytest.fail("AUTH07 failed")
 
-# ------------------ AUTH09 ------------------
+
 def test_auth09_password_toggle(page, request):
+    tcid="AUTH09"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH09'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -78,8 +84,9 @@ def test_auth09_password_toggle(page, request):
         pytest.fail("AUTH09 failed")
 
 
-# ------------------ AUTH10 ------------------
 def test_auth10_first_next(page, request):
+    tcid="AUTH10"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH10'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -103,8 +110,10 @@ def test_auth10_first_next(page, request):
         pytest.fail("AUTH10 failed")
 
 
-# ------------------ AUTH11 ------------------
+
 def test_auth11_verify_email_in_otp_tab(page, request):
+    tcid="AUTH11"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH11'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -125,8 +134,10 @@ def test_auth11_verify_email_in_otp_tab(page, request):
         update_csv_and_report(login_page, request, "AUTH11", expected, False, str(e))
         pytest.fail("AUTH11 failed")
         
-# ------------------ AUTH15 ------------------
+
 def test_auth15_otp_input_ui(page, request):
+    tcid="AUTH15"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH15'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -154,7 +165,7 @@ def test_auth15_otp_input_ui(page, request):
         
         login_page.btn_next.click()
 
-        # 
+        
         expect(login_page.btn_next).to_be_enabled(timeout=10000)
         page.wait_for_timeout(1000)  
         login_page.btn_next.click()
@@ -177,8 +188,10 @@ def test_auth15_otp_input_ui(page, request):
         update_csv_and_report(login_page, request, "AUTH15", expected, False, str(e))
         pytest.fail("AUTH15 failed")
 
-# ------------------ AUTH16 ------------------
 def test_auth16_otp_input_validation(page, request):
+
+    tcid="AUTH16"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH16'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -195,7 +208,6 @@ def test_auth16_otp_input_validation(page, request):
     login_page = LoginPage(page)
 
     try:
-        # -------------------- Step 1: Navigate & login --------------------
         login_page.navigate()
         login_page.tab_login.click()
         login_page.input_email.fill(email)
@@ -239,8 +251,11 @@ def test_auth16_otp_input_validation(page, request):
         update_csv_and_report(login_page, request, "AUTH16", expected, False, str(e))
         pytest.fail("AUTH16 failed")
 
-# ------------------ AUTH12 ------------------
+
 def test_auth12_otp_auto_focus(page, request):
+
+    tcid="AUTH12"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH12'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
@@ -300,7 +315,7 @@ def test_auth12_otp_auto_focus(page, request):
         else:
             print("❌ OTP auto-focus test FAILED")
 
-        # -------------------- Step 4: Update CSV/report --------------------
+       
         update_csv_and_report(login_page, request, "AUTH12", expected, auto_focus_passed)
 
         if not auto_focus_passed:
@@ -310,14 +325,17 @@ def test_auth12_otp_auto_focus(page, request):
         update_csv_and_report(login_page, request, "AUTH12", expected, False, str(e))
         pytest.fail("AUTH12 failed")
 
-# -------------------- AUTH13: OTP Backspace Navigation --------------------
+
 def test_auth13_otp_backspace(page, request):
+
+    tcid="AUTH13"
+    AllureHelper.attach_description(tcid)
     row = test_data_df[test_data_df['TC ID'] == 'AUTH13'].to_dict(orient="records")[0]
     expected = row.get("Expected Result", "N/A")
     test_data_str = str(row.get("Test Data", ""))
 
     import re
-    # Extract Email, Password, OTP
+
     email_match = re.search(r"Email:\s*([^\s]+)", test_data_str, re.IGNORECASE)
     password_match = re.search(r"Password:\s*([^\s,]+)", test_data_str, re.IGNORECASE)
     otp_match = re.search(r"OTP:\s*([^\s]+)", test_data_str, re.IGNORECASE)
@@ -329,7 +347,7 @@ def test_auth13_otp_backspace(page, request):
     login_page = LoginPage(page)
 
     try:
-        # -------------------- Step 1: Login --------------------
+       
         login_page.navigate()
         login_page.tab_login.click()
 
@@ -342,23 +360,23 @@ def test_auth13_otp_backspace(page, request):
         page.wait_for_timeout(1000)
         login_page.btn_next.click()
 
-        # -------------------- Step 2: OTP input --------------------
+     
         otp_inputs = page.locator("input[type='text'][maxlength='1']")
         expect(otp_inputs).to_have_count(len(otp_value), timeout=5000)
 
-        # Step 3: Clear auto-generated OTP
+       
         for i in range(len(otp_value)):
             otp_inputs.nth(i).fill("")
             otp_inputs.nth(i).press("Backspace")
 
-        # Step 4: Enter OTP from CSV
+     
         for i, char in enumerate(otp_value):
             otp_inputs.nth(i).type(char)
-            page.wait_for_timeout(50)  # tiny delay for UI to register
+            page.wait_for_timeout(50)
 
-        # Step 5: Backspace Navigation
+      
         backspace_worked = True
-        for i in range(len(otp_value)-1, 0, -1):  # Start from last OTP box
+        for i in range(len(otp_value)-1, 0, -1):  
             otp_input = otp_inputs.nth(i)
             otp_input.fill("")            
             page.wait_for_timeout(50)     
@@ -387,6 +405,9 @@ def test_auth13_otp_backspace(page, request):
         pytest.fail("AUTH13 failed")
 
 def test_auth14_resend_otp_timer(page, request):
+
+    tcid="AUTH14"
+    AllureHelper.attach_description(tcid)
    
     rows = test_data_df[test_data_df['TC ID'] == 'AUTH14'].to_dict(orient="records")
     if not rows:
@@ -431,6 +452,9 @@ def test_auth14_resend_otp_timer(page, request):
         pytest.fail("AUTH14 failed")
 
 def test_auth17_keyboard_navigation(page, request):
+
+    tcid="AUTH17"
+    AllureHelper.attach_description(tcid)
     
     rows = test_data_df[test_data_df['TC ID'] == 'AUTH17'].to_dict(orient="records")
     if not rows:
@@ -475,6 +499,9 @@ def test_auth17_keyboard_navigation(page, request):
 
 
 def test_auth18_logout_functionality(page, request):
+
+    tcid="AUTH18"
+    AllureHelper.attach_description(tcid)
     rows = test_data_df[test_data_df['TC ID'] == 'AUTH18'].to_dict(orient="records")
     if not rows:
         pytest.skip("AUTH18 test data not found in CSV")

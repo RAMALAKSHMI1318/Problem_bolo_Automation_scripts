@@ -14,7 +14,7 @@ class LoginPage(BasePage):
         self.otp_message = page.locator("p.MuiTypography-body1", has_text="OTP:")
         self.btn_login = page.get_by_role("button", name="Log-in")
 
-        # Optional locators
+      
         self.countdown_text = page.locator("p.MuiTypography-body1.field-link")
         self.resend_button = page.locator("button:has-text('Resend')")
         self.masked_email = page.locator("span.MuiFormControlLabel-label", has_text="Email:")
